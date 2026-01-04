@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 84009333276675050}
   - component: {fileID: 595172470012355730}
   - component: {fileID: 1541665190174509135}
-  - component: {fileID: -4715641711348747972}
   - component: {fileID: -7280022611610802520}
+  - component: {fileID: -6803654766615412975}
   m_Layer: 3
   m_Name: GhostPrefab
   m_TagString: Ghost
@@ -131,23 +131,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1, y: 2}
   m_Direction: 0
---- !u!114 &-4715641711348747972
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7978323540604514240}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e544c027e356c424cbeeef8e82c6c55d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _minLifeTime: 1
-  _maxLifeTime: 4
-  _minSpeed: 1
-  _maxSpeed: 3
-  _ghostPortal: {fileID: 0}
 --- !u!50 &-7280022611610802520
 Rigidbody2D:
   serializedVersion: 5
@@ -175,3 +158,16 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &-6803654766615412975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7978323540604514240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ead47cf1a1f74f44b242e277418196e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ghost
+  enemyData: {fileID: 11400000, guid: 5f7fd8fe1f7efdb4293f59f9372e1b03, type: 2}

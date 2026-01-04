@@ -14,6 +14,14 @@ public class Ghost : MonoBehaviour
     private float _money;
     private EnemyType _enemyType;
     
+    public float Speed => _speed;
+    public float Money => _money;
+    public EnemyType EnemyType => _enemyType;
+
+    [Header("Компоненты")] 
+    private IGhostAbility _ability;
+    private IGhostMovement _movement;
+
     [SerializeField] private EnemyData enemyData;
     private bool canMove = true;
 
@@ -23,25 +31,15 @@ public class Ghost : MonoBehaviour
         _money = enemyData.money;
         _enemyType = enemyData.enemyType;
     }
-
-    public void ApplyMovement()
+    public void Spawn(IGhostMovement movement)
     {
-        
+        _movement = movement;
+        _movement.Init(this);
     }
 
-    public void ApplyAbility()
+    private void Update()
     {
-        
-    }
-
-    public void ApplyVisual()
-    {
-        
-    }
-
-    private void OnEnable()
-    {
-        
+        if(canMove) _movement?.Tick();
     }
 
     public void OnCatch()

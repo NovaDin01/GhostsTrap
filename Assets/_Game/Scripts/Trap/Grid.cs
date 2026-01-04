@@ -98,6 +98,7 @@ public class GridNet : MonoBehaviour
             if (enemy.TryGetComponent<Ghost>(out Ghost ghost)) // Позже переделать под интерфейс
             {
                 ghost.transform.SetParent(transform);
+                ghost.transform.position = transform.position;
                 ghost.OnCatch();
             }
         }

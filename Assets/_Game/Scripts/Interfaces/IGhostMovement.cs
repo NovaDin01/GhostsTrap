@@ -1,5 +1,5 @@
 ﻿public interface IGhostMovement
 {
-    void Init(Ghost ghost, float speed);
+    void Init(Ghost ghost);
     void Tick();
 }
