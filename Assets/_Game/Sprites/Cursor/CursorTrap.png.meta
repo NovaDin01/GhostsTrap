@@ -1,0 +1,377 @@
+fileFormatVersion: 2
+guid: a0b5753725f98aa499102311d094730f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6095606542212057709
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_0
+  - first:
+      213: 7819647417461215031
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_1
+  - first:
+      213: -120791070818997422
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_2
+  - first:
+      213: 3258928160894017515
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_3
+  - first:
+      213: -1795910680945211255
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_4
+  - first:
+      213: 5196272405814672812
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_5
+  - first:
+      213: 3413251827447005461
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_6
+  - first:
+      213: 1077704707033092520
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_7
+  - first:
+      213: -8020661703972089140
+    second: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_8
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 7
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_0
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 605
+        width: 218
+        height: 209
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6ac81faad1f79450800000000000000
+      internalID: 6095606542212057709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_1
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 664
+        width: 168
+        height: 275
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73f839a55e7f48c60800000000000000
+      internalID: 7819647417461215031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_2
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 612
+        width: 220
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25b6bcb392dd25ef0800000000000000
+      internalID: -120791070818997422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_3
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 450
+        width: 320
+        height: 157
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: befda9255e90a3d20800000000000000
+      internalID: 3258928160894017515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_4
+      rect:
+        serializedVersion: 2
+        x: 411
+        y: 436
+        width: 202
+        height: 194
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9884ee530c4a317e0800000000000000
+      internalID: -1795910680945211255
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_5
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 448
+        width: 323
+        height: 156
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cad7fb8d83edc1840800000000000000
+      internalID: 5196272405814672812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_6
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 236
+        width: 218
+        height: 195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5118eefe37e4e5f20800000000000000
+      internalID: 3413251827447005461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_7
+      rect:
+        serializedVersion: 2
+        x: 427
+        y: 86
+        width: 176
+        height: 310
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a1597b98b6c4fe00800000000000000
+      internalID: 1077704707033092520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_8
+      rect:
+        serializedVersion: 2
+        x: 605
+        y: 234
+        width: 215
+        height: 197
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc21a2feca2e0b090800000000000000
+      internalID: -8020661703972089140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_0: 6095606542212057709
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_1: 7819647417461215031
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_2: -120791070818997422
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_3: 3258928160894017515
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_4: -1795910680945211255
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_5: 5196272405814672812
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_6: 3413251827447005461
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_7: 1077704707033092520
+      Phoenix_10_retro_ghostbusters_equipment_style_glow-no-bg-preview (carve.photos)_8: -8020661703972089140
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
