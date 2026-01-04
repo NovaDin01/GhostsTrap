@@ -49,13 +49,13 @@ public class EnemyPool : MonoBehaviour
 
     
     // OnEnable и OnDisable необходимы для событий
-    private void OnEnable()
-    {
-        _trapController.OnLoot += ReturnObject;
-    }
-    
-    private void OnDisable()
-    {
-        _trapController.OnLoot -= ReturnObject;
-    }
+    // private void OnEnable()
+    // {
+    //     _trapController.OnLoot += ReturnObject;
+    // }
+    //
+    // private void OnDisable()
+    // {
+    //     _trapController.OnLoot -= ReturnObject;
+    // }
 }
