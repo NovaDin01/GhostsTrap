@@ -1,61 +1,40 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-// Пул для врагов. Враги не создаются и удаляются все время, а при начале создаются и повторно используются.
-// Он работает пока для одного префаба, после расширю
+
 public class EnemyPool : MonoBehaviour
 {
-    private Queue<GameObject> _objectsPool = new();
-    private GameObject _enemyPrefab;
-    private int _startCount;
+    private readonly Queue<Ghost> _pool = new();
+    private Ghost _prefab;
 
-    [SerializeField] private TrapController _trapController;
-
-    // Происходит заполнение пула и создаются враги.
-    public void Init(GameObject prefab, int count)
+    public void Init(Ghost prefab, int count)
     {
-        _enemyPrefab = prefab;
-        _startCount = count;
+        _prefab = prefab;
 
-        for (int i = 0; i < _startCount; i++) 
+        for (int i = 0; i < count; i++)
         {
-            var obj = Instantiate(_enemyPrefab); 
-            obj.SetActive(false); // Отключаем пока не понадобятся
-            _objectsPool.Enqueue(obj); // Добавялем в спискок пула
+            Ghost g = Instantiate(_prefab, transform);
+            g.gameObject.SetActive(false);
+            _pool.Enqueue(g);
         }
     }
 
-    // Метод взятия объекта. Вместо спавна - мы просто его включаем.
-    public GameObject GetObject()
+    public Ghost Get()
     {
-        if (_objectsPool.Count == 0) // Если в списке больше не осталось врагов - создаем еще и добавляем в список.
+        if (_pool.Count == 0)
         {
-            var obj = Instantiate(_enemyPrefab);
-            obj.SetActive(false);
-            _objectsPool.Enqueue(obj);
+            Ghost g = Instantiate(_prefab, transform);
+            g.gameObject.SetActive(false);
+            _pool.Enqueue(g);
         }
 
-        var objPool = _objectsPool.Dequeue(); // Достаем объект из списка не активных объектов и удаляем его из списка
-        objPool.SetActive(true); 
-        return objPool;
+        Ghost obj = _pool.Dequeue();
+        obj.gameObject.SetActive(true);
+        return obj;
     }
 
-    public void ReturnObject(GameObject returnObject) // Возвращаем обратно (после поимки или исчезновения)
+    public void Return(Ghost ghost)
     {
-        
-        returnObject.SetActive(false);
-        _objectsPool.Enqueue(returnObject);
+        ghost.gameObject.SetActive(false);
+        _pool.Enqueue(ghost);
     }
-
-    
-    // OnEnable и OnDisable необходимы для событий
-    // private void OnEnable()
-    // {
-    //     _trapController.OnLoot += ReturnObject;
-    // }
-    //
-    // private void OnDisable()
-    // {
-    //     _trapController.OnLoot -= ReturnObject;
-    // }
 }

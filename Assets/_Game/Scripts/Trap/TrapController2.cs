@@ -77,7 +77,7 @@ public class TrapController2 : MonoBehaviour
         if (distance < 0.1f)
         {
             _isReturning = false;
-            _enemyPool.ReturnObject(_actualTrapCircle.transform.GetChild(0).gameObject); // !!!
+            //_enemyPool.ReturnObject(_actualTrapCircle.transform.GetChild(0).gameObject); // !!!
             _actualTrapCircle.transform.DetachChildren();
             _actualTrapCircle = null;
         }

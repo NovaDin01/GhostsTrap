@@ -97,6 +97,8 @@ public class GridNet : MonoBehaviour
             
             if (enemy.TryGetComponent<Ghost>(out Ghost ghost)) // Позже переделать под интерфейс
             {
+                if (ghost.IsCaught) continue;
+                
                 ghost.transform.SetParent(transform);
                 ghost.transform.position = transform.position;
                 ghost.OnCatch();
@@ -112,11 +114,16 @@ public class GridNet : MonoBehaviour
         foreach (var enemy in _enemies)
         {
             if (enemy == null) continue;
-            OnLoot?.Invoke(enemy.gameObject); // Не забудь задать Parent!
+
+            enemy.transform.SetParent(null);
+            OnLoot?.Invoke(enemy.gameObject);
         }
-        Destroy(gameObject); // Позже переделать под пул
+
+        Destroy(gameObject);
         _enemies = Array.Empty<Collider2D>();
     }
+
+
 
     // Метод - помощник. Проверяет находится ли сеть рядом с point
     private bool ClosingOnTarget(Vector2 point)

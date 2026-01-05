@@ -13,6 +13,9 @@ public class TrapController : MonoBehaviour
     [Header("Поиск врагов")]
     [SerializeField] private LayerMask enemiesMask;
     
+    [Header("СИСТЕМНЫЕ НАСТРОЙКИ")]
+    [SerializeField] private EnemyPool enemyPool;
+    
     private Vector2 targetPosition;
     private Vector2 trapPosition;
     
@@ -36,10 +39,30 @@ public class TrapController : MonoBehaviour
         canClick = false;
     }
 
-    private void GridCreate() // Создание сетки и задание координат
+    private void GridCreate()
     {
         GridNet grid = Instantiate(gridPrefab);
+        
+        grid.OnLoot += HandleLoot;
+
         grid.Init(gridSpeed, gridRadius, enemiesMask, trapPosition, targetPosition);
     }
+    
+    private void HandleLoot(GameObject enemyGo)
+    {
+        if (enemyGo == null) return;
+
+        if (enemyGo.TryGetComponent<Ghost>(out var ghost))
+        {
+            ghost.ResetForPool(); 
+            enemyPool.Return(ghost);
+        }
+        else
+        {
+            enemyGo.SetActive(false);
+        }
+    }
+
+
 
 }

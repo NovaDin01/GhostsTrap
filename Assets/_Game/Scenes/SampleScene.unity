@@ -165,6 +165,39 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1057996294}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &111148185
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 111148186}
+  m_Layer: 0
+  m_Name: '[CUSTOMIZABLE]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &111148186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111148185}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.71205, y: 0.54471, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 858135454}
+  - {fileID: 2138226566}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &231107790
 GameObject:
   m_ObjectHideFlags: 0
@@ -331,7 +364,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f383cdfa23e30248965a4c33660175a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPool
-  _trapController: {fileID: 2138226568}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -578,12 +610,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 858135453}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -5.69816, y: -0.24361998, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1057996294}
+  m_Father: {fileID: 111148186}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &858135455
 MonoBehaviour:
@@ -597,7 +629,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53b31bb9d32a4aa5b69f90a045b908cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostFactory
+  minDistance: 2
+  maxDistance: 5
+  minTimeSpawn: 1
+  maxTimeSpawn: 3
+  baseMoveData: {fileID: 11400000, guid: 1a4ae5c0da6b7544881fc615502bf27c, type: 2}
+  randomMoveData: {fileID: 11400000, guid: 4347145c10e2f654ca1b71e40e8fe3e7, type: 2}
   ghostPrefab: {fileID: -6803654766615412975, guid: b00d5077e29161b4c9f2ade427e577df, type: 3}
+  enemyPool: {fileID: 499048930}
+  startPoolCount: 10
 --- !u!1 &1057996293
 GameObject:
   m_ObjectHideFlags: 0
@@ -630,7 +670,6 @@ Transform:
   - {fileID: 1293131151}
   - {fileID: 79819867}
   - {fileID: 499048929}
-  - {fileID: 858135454}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1293131148
@@ -722,7 +761,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2138226566}
   - component: {fileID: 2138226565}
-  - component: {fileID: 2138226567}
   - component: {fileID: 2138226568}
   m_Layer: 0
   m_Name: TrapBox
@@ -798,35 +836,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2138226564}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -5.71205, y: -0.54471, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 111148186}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2138226567
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2138226564}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 964cccbf691e3ff439fb651784f682b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _trapCirclePrefab: {fileID: 4927899784363983950, guid: f86e7d73f8058834b93c00b905132e15, type: 3}
-  _cursorController: {fileID: 79819866}
-  _trapBoxPosition: {fileID: 2138226566}
-  _ghost: {fileID: 0}
-  _enemyPool: {fileID: 0}
-  _trapMoveSpeed: 5
-  _returnToBoxSpeed: 2
-  _catchRadius: 0.5
-  _openSprite: {fileID: -1541214670942149283, guid: 506e9425561a97c47a0da0b629aee3b7, type: 3}
-  _closedSprite: {fileID: 8309750130385104170, guid: a73a27442ccfc3b4c8f14dd362ce7342, type: 3}
 --- !u!114 &2138226568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -840,11 +856,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrapController
   gridSpeed: 5
-  gridRadius: 0.5
+  gridRadius: 1.5
   gridPrefab: {fileID: -2401509042453229422, guid: d90a16f49823d464db89458cd6b171f7, type: 3}
   enemiesMask:
     serializedVersion: 2
     m_Bits: 8
+  enemyPool: {fileID: 499048930}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -854,4 +871,4 @@ SceneRoots:
   - {fileID: 282977128}
   - {fileID: 1057996294}
   - {fileID: 231107792}
-  - {fileID: 2138226566}
+  - {fileID: 111148186}

@@ -1,37 +1,27 @@
 using System;
 using UnityEngine;
 
-public enum EnemyType
-{
-    Basic,
-    Rare
-}
-
 public class Ghost : MonoBehaviour
 {
-    [Header("Характеристики")] 
-    private float _speed;
-    private float _money;
-    private EnemyType _enemyType;
+    [Header("НАСТРОЙКИ ГЕЙМДИЗАЙНА")] 
     
-    public float Speed => _speed;
-    public float Money => _money;
-    public EnemyType EnemyType => _enemyType;
-
+    [SerializeField, Tooltip("Время жизни призрака")]
+    private float lifeTime;
+    
     [Header("Компоненты")] 
     private IGhostAbility _ability;
     private IGhostMovement _movement;
 
-    [SerializeField] private EnemyData enemyData;
-    private bool canMove = true;
+    [Header("")] 
+    public float currentLifeTime;
+    private bool _isCaught = false;
+    public bool IsCaught => _isCaught;
+    public event Action<Ghost> OnDespawnRequested;
 
-    private void Awake() // Задаем характеристики через SO
-    {
-        _speed = enemyData.speed;
-        _money = enemyData.money;
-        _enemyType = enemyData.enemyType;
-    }
-    public void Spawn(IGhostMovement movement)
+
+    
+    // Установка типа движения
+    public void SetMovement(IGhostMovement movement)
     {
         _movement = movement;
         _movement.Init(this);
@@ -39,11 +29,35 @@ public class Ghost : MonoBehaviour
 
     private void Update()
     {
-        if(canMove) _movement?.Tick();
+        if (_isCaught) return;
+
+        _movement?.Tick();
+
+        currentLifeTime += Time.deltaTime;
+        if (currentLifeTime >= lifeTime)
+        {
+            RequestDespawn();
+        }
     }
 
+    // Проверка на: поймали ли призрака
     public void OnCatch()
     {
-        canMove = false;
+        _isCaught = true;
     }
+    
+    public void ResetForPool()
+    {
+        _isCaught = false;
+        currentLifeTime = 0f;
+        transform.SetParent(null);
+    }
+
+    
+    // Событие возвращающее в пул
+    private void RequestDespawn()
+    {
+        OnDespawnRequested?.Invoke(this);
+    }
+
 }

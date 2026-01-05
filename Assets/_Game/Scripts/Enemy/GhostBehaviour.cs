@@ -84,6 +84,6 @@ public class GhostBehaviour : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
-        _enemyPool.ReturnObject(gameObject);
+        //_enemyPool.ReturnObject(gameObject);
     }
 }
