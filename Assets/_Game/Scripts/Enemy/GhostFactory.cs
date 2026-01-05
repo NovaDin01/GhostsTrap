@@ -13,7 +13,7 @@ public class GhostFactory : MonoBehaviour
     public void SpawnGhost()
     {
         Ghost ghost = Instantiate(ghostPrefab);
-        IGhostMovement movement = new BaseMove();
+        IGhostMovement movement = new RandomMove();
 
         ghost.Spawn(movement);
         

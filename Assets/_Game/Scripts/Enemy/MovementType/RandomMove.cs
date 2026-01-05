@@ -11,7 +11,7 @@ public class RandomMove : IGhostMovement
     
     // Переделать под SO
     private float _minDistance = 1f;
-    private float _maxDistance = 3f;
+    private float _maxDistance = 2f;
 
     public void Init(Ghost ghost)
     {

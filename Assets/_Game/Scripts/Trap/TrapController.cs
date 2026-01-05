@@ -25,7 +25,7 @@ public class TrapController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && canClick)
+        if (Input.GetMouseButtonDown(0))
             GetCoordinates();
     }
 
