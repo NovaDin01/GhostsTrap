@@ -22,9 +22,14 @@ public class GridNet : MonoBehaviour
     public event Action<GameObject> OnLoot;
     public event Action<GameObject> onBack;
 
+    private bool canMove;
+
     private void Update()
     {
         State();
+
+        if (_state == GridState.Throwing) GridControll();
+        
     }
 
     // Состояния ловушки
@@ -87,23 +92,31 @@ public class GridNet : MonoBehaviour
         }
     }
 
+    private void GridControll()
+    {
+        
+    }
+
     // Логика поимки
     private void GetCaught()
     {
         _enemies = Physics2D.OverlapCircleAll(transform.position, _radius, _enemiesMask);
-        
+
         foreach (var enemy in _enemies)
         {
             if (enemy == null) continue;
-            
-            if (enemy.TryGetComponent<Ghost>(out Ghost ghost)) // Позже переделать под интерфейс
-            {
-                if (ghost.IsCaught) continue;
-                
-                ghost.transform.SetParent(transform);
-                ghost.transform.position = transform.position;
-                ghost.OnCatch();
-            }
+
+            if (!enemy.TryGetComponent<IObjectAttracted>(out var obj))
+                continue;
+
+            if (obj.IsCaughting())
+                continue;
+
+            var comp = (Component)obj;
+            comp.transform.SetParent(transform);
+            comp.transform.position = transform.position;
+
+            obj.OnCatch();
         }
 
         _state = GridState.Returning;
@@ -123,8 +136,6 @@ public class GridNet : MonoBehaviour
         
         _enemies = Array.Empty<Collider2D>();
     }
-
-
 
     // Метод - помощник. Проверяет находится ли сеть рядом с point
     private bool ClosingOnTarget(Vector2 point)

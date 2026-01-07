@@ -953,13 +953,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14f51a970f945f1499f8f89e0ff581f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrapController
-  gridSpeed: 5
-  gridRadius: 1.5
+  startGridSpeed: 8
+  startGridRadius: 1.5
+  startGridCount: 3
+  enemyPool: {fileID: 499048930}
   gridPrefab: {fileID: -2401509042453229422, guid: d90a16f49823d464db89458cd6b171f7, type: 3}
   enemiesMask:
     serializedVersion: 2
     m_Bits: 8
-  enemyPool: {fileID: 499048930}
+  _currentGridCount: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

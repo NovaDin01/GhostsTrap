@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Ghost : MonoBehaviour
+public class Ghost : MonoBehaviour, IObjectAttracted
 {
     [Header("ÍÀÑÒĞÎÉÊÈ ÃÅÉÌÄÈÇÀÉÍÀ")] 
     
@@ -17,7 +17,6 @@ public class Ghost : MonoBehaviour
     [Header("")] 
     public float currentLifeTime;
     private bool _isCaught = false;
-    public bool IsCaught => _isCaught;
     public event Action<Ghost> OnDespawnRequested;
 
 
@@ -55,6 +54,10 @@ public class Ghost : MonoBehaviour
         transform.SetParent(null);
     }
 
+    public bool IsCaughting()
+    {
+        return _isCaught;
+    }
     
     // Ñîáûòèå âîçâğàùàşùåå â ïóë
     private void RequestDespawn()
