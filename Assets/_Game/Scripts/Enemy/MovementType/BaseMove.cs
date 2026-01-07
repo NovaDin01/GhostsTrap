@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class BaseMove : IGhostMovement
+public class BaseMove : IGhostMovement, ISpeedModifiable
 {
     private Ghost _ghost;
 
@@ -10,6 +10,8 @@ public class BaseMove : IGhostMovement
     private BaseMoveSO _settings;
     private float _segmentDistance;
 
+    private float _multiplier;
+    
     public BaseMove(BaseMoveSO settings)
     {
         _settings = settings;
@@ -25,16 +27,22 @@ public class BaseMove : IGhostMovement
         _dir = RandomDir();
     }
 
+    public void SetSpeedMultiplier(float multiplier)
+    {
+        _multiplier = multiplier;
+    }
+
     // Движение за кадр
     public void Tick()
     {
-        float step = _settings.speed * Time.deltaTime;
+        float step = _settings.speed * _multiplier * Time.deltaTime;
         _ghost.transform.position += (Vector3)(_dir * step);
 
         float moved = Vector2.Distance(_ghost.transform.position, _startPos);
         if (moved >= _segmentDistance)
         {
             _dir *= -1;
+            _startPos = _ghost.transform.position;
         }
     }
 

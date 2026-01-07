@@ -48,14 +48,14 @@ public class GhostFactory : MonoBehaviour
     // Рандомная выборка типа движения
     private void RandomMovement()
     {
-        int index = Random.Range(1, 3);
+        int index = Random.Range(0, 2);
 
         switch (index)
         {
-            case 1:
+            case 0:
                 _movement = new BaseMove(baseMoveData);
                 break;
-            case 2:
+            case 1:
                 _movement = new RandomMove(randomMoveData);
                 break;
         }

@@ -20,6 +20,7 @@ public class GridNet : MonoBehaviour
     
     private Collider2D[] _enemies = Array.Empty<Collider2D>();
     public event Action<GameObject> OnLoot;
+    public event Action<GameObject> onBack;
 
     private void Update()
     {
@@ -118,8 +119,8 @@ public class GridNet : MonoBehaviour
             enemy.transform.SetParent(null);
             OnLoot?.Invoke(enemy.gameObject);
         }
-
-        Destroy(gameObject);
+        onBack?.Invoke(gameObject);
+        
         _enemies = Array.Empty<Collider2D>();
     }
 

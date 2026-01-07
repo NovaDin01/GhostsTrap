@@ -12,6 +12,8 @@ public class Ghost : MonoBehaviour
     private IGhostAbility _ability;
     private IGhostMovement _movement;
 
+    public IGhostMovement Movement => _movement;
+
     [Header("")] 
     public float currentLifeTime;
     private bool _isCaught = false;
