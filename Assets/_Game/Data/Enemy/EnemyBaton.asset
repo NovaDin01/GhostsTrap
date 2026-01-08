@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b9aaed3c5864fd09d5b2de24f86a22a, type: 3}
   m_Name: EnemyBaton
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  speed: 0
-  hp: 0
-  award: 0
+  hp: 1
+  award: 1
+  hasArmor: 0

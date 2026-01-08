@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 831be600c2ac409a8435d491f88a6b07, type: 3}
   m_Name: ApproachingMoveInfo
   m_EditorClassIdentifier: Assembly-CSharp::ApproachingMoveSO
-  speed: 0
-  minDistance: 0
+  speed: 2
+  multSpeed: 0
+  minDistance: 2
