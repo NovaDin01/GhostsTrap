@@ -63,10 +63,10 @@ public class TrapController : MonoBehaviour
     {
         if (enemyGo == null) return;
 
-        if (enemyGo.TryGetComponent<Ghost>(out var ghost))
+        if (enemyGo.TryGetComponent<Enemy>(out var enemy))
         {
-            ghost.ResetForPool(); 
-            enemyPool.Return(ghost);
+            enemy.ResetForPool(); 
+            enemyPool.Return(enemy);
         }
         else
         {

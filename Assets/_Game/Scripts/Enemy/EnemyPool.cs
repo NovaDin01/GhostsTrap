@@ -3,38 +3,38 @@ using UnityEngine;
 
 public class EnemyPool : MonoBehaviour
 {
-    private readonly Queue<Ghost> _pool = new();
-    private Ghost _prefab;
+    private readonly Queue<Enemy> _pool = new();
+    private Enemy _prefab;
 
-    public void Init(Ghost prefab, int count)
+    public void Init(Enemy prefab, int count)
     {
         _prefab = prefab;
 
         for (int i = 0; i < count; i++)
         {
-            Ghost g = Instantiate(_prefab, transform);
+            Enemy g = Instantiate(_prefab, transform);
             g.gameObject.SetActive(false);
             _pool.Enqueue(g);
         }
     }
 
-    public Ghost Get()
+    public Enemy Get()
     {
         if (_pool.Count == 0)
         {
-            Ghost g = Instantiate(_prefab, transform);
+            Enemy g = Instantiate(_prefab, transform);
             g.gameObject.SetActive(false);
             _pool.Enqueue(g);
         }
 
-        Ghost obj = _pool.Dequeue();
+        Enemy obj = _pool.Dequeue();
         obj.gameObject.SetActive(true);
         return obj;
     }
 
-    public void Return(Ghost ghost)
+    public void Return(Enemy enemy)
     {
-        ghost.gameObject.SetActive(false);
-        _pool.Enqueue(ghost);
+        enemy.gameObject.SetActive(false);
+        _pool.Enqueue(enemy);
     }
 }

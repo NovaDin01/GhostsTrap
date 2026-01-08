@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum GridState
@@ -19,17 +20,13 @@ public class GridNet : MonoBehaviour
     private GridState _state;
     
     private Collider2D[] _enemies = Array.Empty<Collider2D>();
+    private readonly List<Collider2D> _caught = new();
     public event Action<GameObject> OnLoot;
     public event Action<GameObject> onBack;
-
-    private bool canMove;
 
     private void Update()
     {
         State();
-
-        if (_state == GridState.Throwing) GridControll();
-        
     }
 
     // Состояния ловушки
@@ -92,11 +89,6 @@ public class GridNet : MonoBehaviour
         }
     }
 
-    private void GridControll()
-    {
-        
-    }
-
     // Логика поимки
     private void GetCaught()
     {
@@ -108,15 +100,13 @@ public class GridNet : MonoBehaviour
 
             if (!enemy.TryGetComponent<IObjectAttracted>(out var obj))
                 continue;
+            
+            var result = obj.TryCatch(transform);
 
-            if (obj.IsCaughting())
+            if (result != CatchResult.Caught)
                 continue;
 
-            var comp = (Component)obj;
-            comp.transform.SetParent(transform);
-            comp.transform.position = transform.position;
-
-            obj.OnCatch();
+            _caught.Add(enemy);
         }
 
         _state = GridState.Returning;
@@ -125,7 +115,7 @@ public class GridNet : MonoBehaviour
     // Получение лута
     private void GetLoot()
     {
-        foreach (var enemy in _enemies)
+        foreach (var enemy in _caught)
         {
             if (enemy == null) continue;
 
@@ -135,6 +125,7 @@ public class GridNet : MonoBehaviour
         onBack?.Invoke(gameObject);
         
         _enemies = Array.Empty<Collider2D>();
+        _caught.Clear();
     }
 
     // Метод - помощник. Проверяет находится ли сеть рядом с point

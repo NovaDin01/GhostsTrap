@@ -1,5 +1,14 @@
-﻿public interface IObjectAttracted
+﻿using UnityEngine;
+
+public enum CatchResult
 {
-    void OnCatch();
-    bool IsCaughting();
+    AlreadyCaught,// уже пойман
+    Resisted,     // попытка была, но не пойман
+    Caught        // пойман 
+}
+
+public interface IObjectAttracted
+{
+    CatchResult TryCatch(Transform catcher);
+    bool IsCaught();
 }

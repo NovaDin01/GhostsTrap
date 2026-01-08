@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Ghost : MonoBehaviour, IObjectAttracted
+public abstract class Ghost : MonoBehaviour, IObjectAttracted
 {
     [Header("НАСТРОЙКИ ГЕЙМДИЗАЙНА")] 
     
@@ -9,10 +9,10 @@ public class Ghost : MonoBehaviour, IObjectAttracted
     private float lifeTime;
     
     [Header("Компоненты")] 
-    private IGhostAbility _ability;
-    private IGhostMovement _movement;
+    //private IGhostAbility _ability;
+    private IEnemyMovement _movement;
 
-    public IGhostMovement Movement => _movement;
+    public IEnemyMovement Movement => _movement;
 
     [Header("")] 
     public float currentLifeTime;
@@ -22,11 +22,11 @@ public class Ghost : MonoBehaviour, IObjectAttracted
 
     
     // Установка типа движения
-    public void SetMovement(IGhostMovement movement)
-    {
-        _movement = movement;
-        _movement.Init(this);
-    }
+    // public void SetMovement(IEnemyMovement movement)
+    // {
+    //     _movement = movement;
+    //     _movement.Init(this);
+    // }
 
     private void Update()
     {
@@ -54,7 +54,7 @@ public class Ghost : MonoBehaviour, IObjectAttracted
         transform.SetParent(null);
     }
 
-    public bool IsCaughting()
+    public bool IsCaught()
     {
         return _isCaught;
     }
