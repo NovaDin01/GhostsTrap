@@ -92,6 +92,8 @@ public class GridNet : MonoBehaviour
     // Логика поимки
     private void GetCaught()
     {
+        _caught.Clear();
+        
         _enemies = Physics2D.OverlapCircleAll(transform.position, _radius, _enemiesMask);
 
         foreach (var enemy in _enemies)

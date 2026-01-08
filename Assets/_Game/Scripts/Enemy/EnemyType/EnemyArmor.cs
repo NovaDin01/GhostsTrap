@@ -57,14 +57,14 @@ public class EnemyArmor : Enemy, IAttacker
 
     public override CatchResult TryCatch(Transform catcher)
     {
-        
-        
+        if (_isCaught) return CatchResult.AlreadyCaught;
+
         if (_hasArmor)
         {
             BreakArmor();
             return CatchResult.Resisted;
         }
-        
+
         return base.TryCatch(catcher);
         
     }
