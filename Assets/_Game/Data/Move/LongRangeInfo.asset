@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 831be600c2ac409a8435d491f88a6b07, type: 3}
   m_Name: LongRangeInfo
   m_EditorClassIdentifier: Assembly-CSharp::ApproachingMoveSO
-  speed: 2
-  angularSpeed: 1
+  speed: 3
+  angularSpeed: 2
   multSpeed: 0
-  distance: 4
+  distance: 2.5

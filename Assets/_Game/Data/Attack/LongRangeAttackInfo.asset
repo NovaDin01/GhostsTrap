@@ -16,6 +16,6 @@ MonoBehaviour:
   speedFire: 3
   rangeFire: 4
   bulletCount: 3
-  bulletDelay: 0.5
-  bulletSpeed: 8
+  bulletDelay: 0.2
+  bulletSpeed: 10
   bullet: {fileID: 4720098165273911428, guid: d65162c6bb0bf0a4f8c150420922cd58, type: 3}

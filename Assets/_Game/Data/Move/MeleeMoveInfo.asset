@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13d634d171934389b79e091a7f37c9bb, type: 3}
   m_Name: MeleeMoveInfo
   m_EditorClassIdentifier: Assembly-CSharp::_Game.Scripts.Data.MeleeMoveSO
-  speed: 2.5
+  speed: 3.5
   multSpeed: 0
   distance: 4
