@@ -103,6 +103,9 @@ public class GridNet : MonoBehaviour
             if (!enemy.TryGetComponent<IObjectAttracted>(out var obj))
                 continue;
             
+            if(enemy.TryGetComponent<ITakingDamage>(out var takingDamage))
+                takingDamage.ApplyDamage(1); //TODO: "потом добавить переменную";
+            
             var result = obj.TryCatch(transform);
 
             if (result != CatchResult.Caught)

@@ -3,9 +3,22 @@
 [CreateAssetMenu(menuName = "Data/Enemy", fileName = "EnemyInfo")]
 public class EnemyData : ScriptableObject
 {
-    [SerializeField] public int hp;
-    [SerializeField] public int award;
+    [SerializeField] private int hp;
+    [SerializeField] private int award;
     
     [SerializeField, Tooltip("Есть броня?")]
-    public bool hasArmor;
+    private bool hasArmor;
+
+    [SerializeField, Tooltip("Тип передвижения")]
+    private MovementType moveType;
+
+    [SerializeField, Tooltip("Тип атаки")] 
+    private AttackType attackType;
+
+    public int Hp => hp;
+    public int Award => award;
+    public bool HasArmor => hasArmor;
+    public MovementType MoveType => moveType;
+    public AttackType AttackType => attackType;
+
 }

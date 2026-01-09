@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b9aaed3c5864fd09d5b2de24f86a22a, type: 3}
-  m_Name: Scientist
+  m_Name: SoilderRifle
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   hp: 1
   award: 1
   hasArmor: 0
-  moveType: 0
-  attackType: 0
+  moveType: 1
+  attackType: 1

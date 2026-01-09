@@ -9,11 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b9aaed3c5864fd09d5b2de24f86a22a, type: 3}
-  m_Name: Scientist
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  hp: 1
-  award: 1
-  hasArmor: 0
-  moveType: 0
-  attackType: 0
+  m_Script: {fileID: 11500000, guid: 831be600c2ac409a8435d491f88a6b07, type: 3}
+  m_Name: LongRangeInfo
+  m_EditorClassIdentifier: Assembly-CSharp::ApproachingMoveSO
+  speed: 2
+  angularSpeed: 1
+  multSpeed: 0
+  distance: 4
