@@ -6,27 +6,29 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 {
     [SerializeField] protected EnemyData enemyData;
     [SerializeField] protected MovementSettingsSO settingsMovement;
-    [SerializeField] protected Player player;
+    protected Player _player;
     protected IEnemyMovement _movement;
     
     private int _hp;
     private bool _hasArmor;
-    
     protected bool _isCaught = false;
-    public bool IsCaught() => _isCaught;
     
-    public event Action<Enemy> OnDespawnRequested;
+    public TypeAward AwardType => TypeAward.Money;
+    public int AwardValue => enemyData.Award;
+    
+    public event Action<Enemy> OnCollectedEnemy;
 
     public virtual void Awake()
-    {
-        ChooseMovementType();
-    }
-
-    protected virtual void OnEnable()
     {
         _hasArmor = enemyData.HasArmor;
         _isCaught = false;
         _hp = enemyData.Hp;
+    }
+
+    public virtual void Init(Player player)
+    {
+        _player = player;
+        ChooseMovementType();
     }
 
     public virtual void Update()
@@ -41,17 +43,17 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         {
             case MovementType.PanicType:
                 _movement = new PanicMove();
-                _movement.Init(this, player, settingsMovement);
+                _movement.Init(this, _player, settingsMovement);
                 break;
             
             case MovementType.LongRangeType:
                 _movement = new LongRangeMove();
-                _movement.Init(this, player, settingsMovement);
+                _movement.Init(this, _player, settingsMovement);
                 break;
             
             case MovementType.MeleeType:
                 _movement = new MeleeMove();
-                _movement.Init(this, player, settingsMovement);
+                _movement.Init(this, _player, settingsMovement);
                 break;
         }
     }
@@ -89,15 +91,12 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         _hp -= amount;
         // Событие для визуала
     }
-    
-    private void RequestDespawn()
+
+    public void OnCollected()
     {
-        OnDespawnRequested?.Invoke(this);
+        //TODO: Событие для визуала
+        OnCollectedEnemy?.Invoke(this);
+        Destroy(gameObject);
     }
     
-    public virtual void ResetForPool()
-    {
-        _isCaught = false;
-        transform.SetParent(null);
-    }
 }

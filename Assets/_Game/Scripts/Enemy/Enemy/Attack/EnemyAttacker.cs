@@ -18,13 +18,14 @@ public class EnemyAttacker : Enemy
     public override void Awake()
     {
         base.Awake();
+        _state = ActionState.Movement;
         ChooseAttackType();
     }
 
-    protected override void OnEnable()
+    public override void Init(Player player)
     {
-        base.OnEnable();
-        _state = ActionState.Movement;
+        base.Init(player);
+        ChooseAttackType();
     }
 
     public override void Update()
@@ -39,12 +40,12 @@ public class EnemyAttacker : Enemy
         {
             case AttackType.BaseBaton:
                 _attacker = new BatonAttack();
-                _attacker.Init(player, this, setting);
+                _attacker.Init(_player, this, setting);
                 break;
 
             case AttackType.AssaultRifle:
                 _attacker = new LongRangeAttack();
-                _attacker.Init(player, this, setting);
+                _attacker.Init(_player, this, setting);
                 break;
         }
     }

@@ -7,8 +7,19 @@ public enum CatchResult
     Caught        // пойман 
 }
 
+public enum TypeAward
+{
+    Money,
+    Hp,
+    Ability
+}
+
 public interface IObjectAttracted
 {
     CatchResult TryCatch(Transform catcher);
-    bool IsCaught();
+    TypeAward AwardType { get; }
+    int AwardValue { get; }
+    
+    void OnCollected();
 }
+

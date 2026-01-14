@@ -7,10 +7,8 @@ public class Player : MonoBehaviour, ITakingDamage
     [SerializeField] private float startGridSpeed = 8f;
     [SerializeField] private float startGridRadius = 1.5f;
     [SerializeField] private int startGridCount = 3;
+    [SerializeField] private int startMaxHp = 10;
     [SerializeField] private int hp = 5;
-    
-    [Header("СИСТЕМНЫЕ НАСТРОЙКИ")]
-    [SerializeField] private EnemyPool enemyPool;
     
     [Header("Ссылки")]
     [SerializeField] private GridNet gridPrefab;
@@ -27,6 +25,8 @@ public class Player : MonoBehaviour, ITakingDamage
     private float _gridSpeed;
     private float _gridRadius;
     
+    private int maxHp;
+    
     private void Awake()
     {
         _trapPosition = transform.position;
@@ -35,6 +35,7 @@ public class Player : MonoBehaviour, ITakingDamage
         _gridCount = startGridCount;
         _gridSpeed = startGridSpeed;
         _gridRadius = startGridRadius;
+        maxHp = startMaxHp;
     }
 
     private void Update()
@@ -60,30 +61,68 @@ public class Player : MonoBehaviour, ITakingDamage
         grid.Init(_gridSpeed, _gridRadius, enemiesMask, _trapPosition, _targetPosition);
     }
     
-    private void HandleLoot(GameObject enemyGo)
+    private void HandleLoot(GameObject loot)
     {
-        if (enemyGo == null) return;
+        if (loot == null) return;
 
-        if (enemyGo.TryGetComponent<Enemy>(out var enemy))
+        if (loot.TryGetComponent<IObjectAttracted>(out var a))
         {
-            enemy.ResetForPool(); 
-            enemyPool.Return(enemy);
+            switch (a.AwardType)
+            {
+                case TypeAward.Money:
+                    MoneySystem.Instance.Add(a.AwardValue);
+                    break;
+                
+                case TypeAward.Hp:
+                    Heal(a.AwardValue);
+                    break;
+                
+                case TypeAward.Ability:
+                    // abilities.ActivateForSeconds(a.AwardValue);
+                    break;
+            }
+            
+            if (loot.TryGetComponent<Enemy>(out var enemy))
+            {
+                enemy.OnCollected();
+            }
+            else
+            {
+                Destroy(loot); // запасной вариант, если это не Enemy
+            }
+
+          
         }
-        else
-        {
-            enemyGo.SetActive(false);
-        }
+        
     }
 
     private void GridBack(GameObject gridObj)
     {
         _currentGridCount--;
+
+        if (gridObj.TryGetComponent<GridNet>(out var grid))
+        {
+            grid.OnLoot -= HandleLoot;
+            grid.onBack -= GridBack;
+        }
+
         Destroy(gridObj);
     }
 
+
+    public void Heal(int amount)
+    {
+        hp += amount;
+        if (hp >= maxHp)
+        {
+            hp = maxHp;
+        }
+    }
+    
+
     public void ApplyDamage(int amount)
     {
-        hp--;
+        hp -= amount;
         if (hp <= 0)
         {
             Debug.Log("Death"); // Потом переделать в метод + событие
