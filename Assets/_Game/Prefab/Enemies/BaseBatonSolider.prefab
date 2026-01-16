@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6912939503289916651}
   - component: {fileID: 6722398179404842650}
   - component: {fileID: 2336108599352573318}
+  - component: {fileID: 7404267149978439372}
   m_Layer: 3
   m_Name: BaseBatonSolider
   m_TagString: Untagged
@@ -29,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.64, y: 3.04, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -83,8 +84,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 44688b206c006c74eaa30fdb1e220cd2, type: 3}
-  m_Color: {r: 0.43867922, g: 0.9530551, b: 1, a: 1}
+  m_Sprite: {fileID: -6470460504253458178, guid: 6b621d4cb8fd0dd4c853f318ff44a4da, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -127,17 +128,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.00799983, y: 0.00000008940697}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.5, y: 2.02}
+    oldSize: {x: 0.29, y: 0.56}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.5, y: 2.02}
+  m_Size: {x: 0.3000254, y: 0.56403106}
   m_EdgeRadius: 0
 --- !u!114 &2336108599352573318
 MonoBehaviour:
@@ -153,5 +154,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttacker
   enemyData: {fileID: 11400000, guid: 725cd4b11d728354a80072538d452722, type: 2}
   settingsMovement: {fileID: 11400000, guid: 952dba670704e2845a184d0198f68ae6, type: 2}
-  player: {fileID: 0}
   setting: {fileID: 11400000, guid: 358b5c8e1aa9bd1488a556e272f675c2, type: 2}
+--- !u!50 &7404267149978439372
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537397527552562641}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

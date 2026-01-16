@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: PanicMoveInfo
   m_EditorClassIdentifier: Assembly-CSharp::RandomMoveSO
   speed: 5
-  minDistance: 1
-  maxDistance: 2
+  minDistance: 2
+  maxDistance: 4

@@ -6,6 +6,7 @@ public class MeleeMove : IEnemyMovement
 {
     private Enemy _enemy;
     private Player _player;
+    private SpriteRenderer _sprite;
 
     private MeleeMoveSO _setting;
 
@@ -15,15 +16,26 @@ public class MeleeMove : IEnemyMovement
         _player = player;
         _enemy = enemy;
         _setting = settingsSo as MeleeMoveSO;
-        
+
         if (_setting == null)
-            throw new ArgumentException("PanicMove requires PanicMoveSO");
+            throw new ArgumentException("MeleeMove requires MeleeMoveSO");
+
+        _sprite = enemy.GetComponentInChildren<SpriteRenderer>();
     }
 
     public void Tick()
     {
         float step = _setting.Speed * Time.deltaTime;
-        _enemy.transform.position = Vector3.MoveTowards(_enemy.transform.position,
-            _player.transform.position, step);
+
+        Vector3 enemyPos = _enemy.transform.position;
+        Vector3 targetPos = _player.transform.position;
+
+        Vector3 delta = targetPos - enemyPos; // направление к игроку
+
+        // flip по X (минимально)
+        if (_sprite != null && Mathf.Abs(delta.x) > 0.01f)
+            _sprite.flipX = delta.x > 0;
+
+        _enemy.transform.position = Vector3.MoveTowards(enemyPos, targetPos, step);
     }
 }

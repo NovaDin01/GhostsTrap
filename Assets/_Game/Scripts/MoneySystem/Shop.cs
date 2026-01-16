@@ -1,18 +1,18 @@
-using System;
-using UnityEngine;
+    using System;
+    using UnityEngine;
 
-public class Shop : MonoBehaviour
-{
-    private Upgrade upgrade;
-
-    private void Update()
+    public class Shop : MonoBehaviour
     {
+        private Upgrade upgrade;
+
+        private void Update()
+        {
+            
+        }
+
+        public void BuyUpgrade(Upgrade upgrade)
+        {
+            upgrade.Get();
+        }
         
     }
-
-    public void BuyUpgrade(Upgrade upgrade)
-    {
-        upgrade.Get();
-    }
-    
-}

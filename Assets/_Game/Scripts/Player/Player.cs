@@ -9,8 +9,8 @@ public class Player : MonoBehaviour, ITakingDamage
     [SerializeField] private float startGridSpeed = 8f;
     [SerializeField] private float startGridRadius = 1.5f;
     [SerializeField] private int startGridCount = 1;
-    [SerializeField] private int startMaxHp = 10;
-    private int currentHp = 5;
+    [SerializeField] private int startMaxHp = 3;
+    private int currentHp = 3;
     
     [Header("Ссылки")]
     [SerializeField] private GridNet gridPrefab;
@@ -27,6 +27,12 @@ public class Player : MonoBehaviour, ITakingDamage
     private float _gridSpeed;
     private float _gridRadius;
     private int _maxHp;
+
+    public int MaxHp => _maxHp;
+    public int CurrentHp => currentHp;
+
+    public event Action OnApplyDamage;
+    public event Action OnApplyHeal;
     
     private void Awake()
     {
@@ -116,21 +122,23 @@ public class Player : MonoBehaviour, ITakingDamage
 
     public void Heal(int amount)
     {
+        if (currentHp >= _maxHp) return;
         currentHp += amount;
-        if (currentHp >= _maxHp)
-        {
-            currentHp = _maxHp;
-        }
+        OnApplyHeal?.Invoke();
     }
     
 
     public void ApplyDamage(int amount)
     {
-        currentHp -= amount;
         if (currentHp <= 0)
         {
             Debug.Log("Death"); // Потом переделать в метод + событие
+            return;
         }
+        
+        Debug.Log("DAMAGE EVENT");
+        currentHp -= amount;
+        OnApplyDamage?.Invoke();
     }
 
     
@@ -155,6 +163,7 @@ public class Player : MonoBehaviour, ITakingDamage
     {
         _maxHp = Mathf.Max(1, _maxHp + delta);
         currentHp = Mathf.Min(currentHp, _maxHp);
+        PlayerHealth.Instance.PlusMaxHeart();
     }
 
 }

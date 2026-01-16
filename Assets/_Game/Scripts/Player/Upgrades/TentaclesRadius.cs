@@ -6,8 +6,8 @@ public class TentaclesRadius : Upgrade
 
     public override void Get()
     {
+        if (!CanBuy()) return;
         base.Get();
-        
         Player.Instance.UpgradeGridRadius(amount);
     }
 }

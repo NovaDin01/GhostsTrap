@@ -6,6 +6,7 @@ public class IncreaseHP : Upgrade
 
     public override void Get()
     {
+        if (!CanBuy()) return;
         base.Get();
         Player.Instance.UpgradeMaxHp(amount);
     }

@@ -92,6 +92,14 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         // Событие для визуала
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("SideWall") && _movement is PanicMove)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     public void OnCollected()
     {
         //TODO: Событие для визуала
