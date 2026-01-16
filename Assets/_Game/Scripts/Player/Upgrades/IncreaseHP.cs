@@ -1,0 +1,12 @@
+﻿using UnityEngine;
+
+public class IncreaseHP : Upgrade
+{
+    [SerializeField] private int amount;
+
+    public override void Get()
+    {
+        base.Get();
+        Player.Instance.UpgradeMaxHp(amount);
+    }
+}

@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class Player : MonoBehaviour, ITakingDamage
 {
+    public static Player Instance;
+    
     [Header("Стартовые характеристики щупалец")]
     [SerializeField] private float startGridSpeed = 8f;
     [SerializeField] private float startGridRadius = 1.5f;
-    [SerializeField] private int startGridCount = 3;
+    [SerializeField] private int startGridCount = 1;
     [SerializeField] private int startMaxHp = 10;
-    [SerializeField] private int hp = 5;
+    private int currentHp = 5;
     
     [Header("Ссылки")]
     [SerializeField] private GridNet gridPrefab;
@@ -24,18 +26,20 @@ public class Player : MonoBehaviour, ITakingDamage
     private int _gridCount;
     private float _gridSpeed;
     private float _gridRadius;
-    
-    private int maxHp;
+    private int _maxHp;
     
     private void Awake()
     {
+        if (Instance != null && Instance != this) Destroy(gameObject);
+        else Instance = this;
+        
         _trapPosition = transform.position;
 
         _currentGridCount = 0;
         _gridCount = startGridCount;
         _gridSpeed = startGridSpeed;
         _gridRadius = startGridRadius;
-        maxHp = startMaxHp;
+        _maxHp = startMaxHp;
     }
 
     private void Update()
@@ -112,21 +116,45 @@ public class Player : MonoBehaviour, ITakingDamage
 
     public void Heal(int amount)
     {
-        hp += amount;
-        if (hp >= maxHp)
+        currentHp += amount;
+        if (currentHp >= _maxHp)
         {
-            hp = maxHp;
+            currentHp = _maxHp;
         }
     }
     
 
     public void ApplyDamage(int amount)
     {
-        hp -= amount;
-        if (hp <= 0)
+        currentHp -= amount;
+        if (currentHp <= 0)
         {
             Debug.Log("Death"); // Потом переделать в метод + событие
         }
-        
     }
+
+    
+    // Костыль из-за нехватки времени
+    
+    public void UpgradeGridCount()
+    {
+        _gridCount = Mathf.Max(0, _gridCount + 1);
+    }
+
+    public void UpgradeGridSpeed(float delta)
+    {
+        _gridSpeed = Mathf.Max(0f, _gridSpeed + delta);
+    }
+
+    public void UpgradeGridRadius(float delta)
+    {
+        _gridRadius = Mathf.Max(0f, _gridRadius + delta);
+    }
+
+    public void UpgradeMaxHp(int delta)
+    {
+        _maxHp = Mathf.Max(1, _maxHp + delta);
+        currentHp = Mathf.Min(currentHp, _maxHp);
+    }
+
 }

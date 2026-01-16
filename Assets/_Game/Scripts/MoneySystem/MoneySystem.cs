@@ -4,6 +4,8 @@ using UnityEngine;
 public class MoneySystem : MonoBehaviour
 {
     public static MoneySystem Instance;
+    public event Action OnMoneyChanged;
+
     private int _wallet;
     public int Wallet => _wallet;
 
@@ -23,11 +25,13 @@ public class MoneySystem : MonoBehaviour
     public void Add(int amount)
     {
         _wallet += amount;
+        OnMoneyChanged?.Invoke();
     }
 
     private void Minus(int amount)
     {
         _wallet -= amount;
+        OnMoneyChanged?.Invoke();
     }
 
     public void Buy(int price)

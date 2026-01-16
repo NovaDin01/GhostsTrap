@@ -12,27 +12,27 @@ public enum Location
 
 public class EnemySpawner : MonoBehaviour
 {
+    public static EnemySpawner Instance;
+    
     [SerializeField] private List<Enemy> _enemiesPrefabs;
     [SerializeField] private List<Transform> _scientistSpawnPoint;
     [SerializeField] private List<Transform> _soldierSpawnPoint;
     [SerializeField] private Player player;
 
-    [Header("Количество врагов ...")]
+    [Header("Количество врагов")]
     private int allCount;
     private int currentCount;
 
     [Header("Кулдаун спавна")]
-    [SerializeField] private float minSpawnCooldown;
-    [SerializeField] private float maxSpawnCooldown;
+    [SerializeField] private float spawnCooldown;
 
     private float spawnTime;
 
     [Header("Кулдаун Таймера")]
     private float levelUpCooldown;
-    private float levelTimer; // не используется - можешь удалить, но оставил как у тебя
-
     private int timerLvl;
     private float timerTime;
+    
     private Location _location;
 
     [Header("Вероятность спавна")]
@@ -42,8 +42,21 @@ public class EnemySpawner : MonoBehaviour
 
     private int index;
 
+    public float TimerTime => timerTime;
+
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);  
+        }
+        
         // минимальные проверки, чтобы не падать
         if (_enemiesPrefabs == null || _enemiesPrefabs.Count < 3)
         {
@@ -65,17 +78,21 @@ public class EnemySpawner : MonoBehaviour
 
         ApplyLevelSettings();
         timerTime = levelUpCooldown;
-        spawnTime = Random.Range(minSpawnCooldown, maxSpawnCooldown);
+        spawnTime = spawnCooldown;
+        //spawnTime = Random.Range(minSpawnCooldown, maxSpawnCooldown);
     }
 
     private void Update()
     {
         spawnTime -= Time.deltaTime;
-        timerTime -= Time.deltaTime;
+        
+        if(timerLvl < 4)
+            timerTime -= Time.deltaTime;
 
         if (spawnTime <= 0 && currentCount < allCount)
         {
-            spawnTime = Random.Range(minSpawnCooldown, maxSpawnCooldown);
+            spawnTime = spawnCooldown;
+            //spawnTime = Random.Range(minSpawnCooldown, maxSpawnCooldown);
             Spawn();
         }
 
@@ -99,8 +116,7 @@ public class EnemySpawner : MonoBehaviour
         enemy.Init(player);
 
         currentCount++;
-
-        // ВАЖНО: у Enemy должно быть событие OnDespawnRequested (ты раньше такое показывал)
+        
         enemy.OnCollectedEnemy += OnEnemyDespawnRequested;
     }
 
@@ -132,7 +148,8 @@ public class EnemySpawner : MonoBehaviour
                 rareScientist = 100;
                 rareSoilderBaton = 0;
                 rareSoilderRifle = 0;
-                allCount = 6;
+                allCount = 10;
+                spawnCooldown = 3;
                 break;
 
             case 2:
@@ -140,7 +157,8 @@ public class EnemySpawner : MonoBehaviour
                 rareScientist = 60;
                 rareSoilderBaton = 40;
                 rareSoilderRifle = 0;
-                allCount = 7;
+                allCount = 15;
+                spawnCooldown = 2;
                 break;
 
             case 3:
@@ -148,7 +166,8 @@ public class EnemySpawner : MonoBehaviour
                 rareScientist = 55;
                 rareSoilderBaton = 30;
                 rareSoilderRifle = 15;
-                allCount = 8;
+                allCount = 24;
+                spawnCooldown = 1.5f;
                 break;
 
             case 4:
@@ -156,14 +175,14 @@ public class EnemySpawner : MonoBehaviour
                 rareScientist = 50;
                 rareSoilderBaton = 25;
                 rareSoilderRifle = 25;
-                allCount = 9;
+                allCount = 30;
+                spawnCooldown = 1;
                 break;
         }
     }
 
     private int PickEnemyIndexByChance()
     {
-        // МИНИ-ФИКС: работаем от суммы, чтобы не спавнился 2-й индекс при 0% шансе
         float w0 = Mathf.Max(0f, rareScientist);
         float w1 = Mathf.Max(0f, rareSoilderBaton);
         float w2 = Mathf.Max(0f, rareSoilderRifle);
