@@ -16,7 +16,7 @@ public class Player : MonoBehaviour, ITakingDamage
     [SerializeField] private GridNet gridPrefab;
     
     [Header("Поиск врагов")]
-    [SerializeField] private LayerMask enemiesMask;
+    [SerializeField] private LayerMask lootsMask;
     
     private Vector2 _targetPosition;
     private Vector2 _trapPosition;
@@ -68,7 +68,7 @@ public class Player : MonoBehaviour, ITakingDamage
         grid.OnLoot += HandleLoot;
         grid.onBack += GridBack;
 
-        grid.Init(_gridSpeed, _gridRadius, enemiesMask, _trapPosition, _targetPosition);
+        grid.Init(_gridSpeed, _gridRadius, lootsMask, _trapPosition, _targetPosition);
     }
     
     private void HandleLoot(GameObject loot)

@@ -111,21 +111,29 @@ public class EnemySpawner : MonoBehaviour
         Transform spawnPoint = GetSpawnPointFor(index);
         Enemy prefab = _enemiesPrefabs[index];
 
-        // минимально: сохраняем ссылку, чтобы подписаться и уменьшать currentCount при смерти
         Enemy enemy = Instantiate(prefab, spawnPoint.position, spawnPoint.rotation);
         enemy.Init(player);
 
         currentCount++;
-        
-        enemy.OnCollectedEnemy += OnEnemyDespawnRequested;
+
+        enemy.OnCollectedEnemy += OnEnemyCollected;   // если надо награду/эффекты
+        enemy.OnDespawned += OnEnemyDespawned;        
     }
 
-    private void OnEnemyDespawnRequested(Enemy enemy)
+    private void OnEnemyCollected(Enemy enemy)
     {
-        // отписываемся и уменьшаем лимит живых
-        enemy.OnCollectedEnemy -= OnEnemyDespawnRequested;
+        // тут можно начислить награду/сделать визуал
+        
+    }
+
+    private void OnEnemyDespawned(Enemy enemy)
+    {
+        enemy.OnCollectedEnemy -= OnEnemyCollected;
+        enemy.OnDespawned -= OnEnemyDespawned;
+
         currentCount = Mathf.Max(0, currentCount - 1);
     }
+
 
     private Transform GetSpawnPointFor(int enemyIndex)
     {

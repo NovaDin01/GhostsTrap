@@ -13,7 +13,7 @@ public class GridNet : MonoBehaviour
 {
     private float _speed;
     private float _radius;
-    private LayerMask _enemiesMask;
+    private LayerMask _loots;
     private Vector2 _trap;
     private Vector2 _target;
     
@@ -48,13 +48,13 @@ public class GridNet : MonoBehaviour
     }
 
     // Инициализация ловушки
-    public void Init(float speed, float radius, LayerMask enemiesMask, Vector2 trap, Vector2 target)
+    public void Init(float speed, float radius, LayerMask loots, Vector2 trap, Vector2 target)
     {
         _target = target;
         _trap = trap;
         _speed = speed;
         _radius = radius;
-        _enemiesMask = enemiesMask;
+        _loots = loots;
 
         SetDefaultSettings();
     }
@@ -94,7 +94,7 @@ public class GridNet : MonoBehaviour
     {
         _caught.Clear();
         
-        _enemies = Physics2D.OverlapCircleAll(transform.position, _radius, _enemiesMask);
+        _enemies = Physics2D.OverlapCircleAll(transform.position, _radius, _loots);
 
         foreach (var enemy in _enemies)
         {

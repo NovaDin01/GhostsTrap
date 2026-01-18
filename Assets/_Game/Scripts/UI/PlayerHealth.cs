@@ -29,7 +29,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void PlusHeart()
     {
-        for (int i = heartSprites.Count - 1; i >= 0; i--)
+        for (int i = 0; i < heartSprites.Count; i++)
         {
             if (heartSprites[i].sprite == emptyHeart)
             {

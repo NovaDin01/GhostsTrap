@@ -6,22 +6,34 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 {
     [SerializeField] protected EnemyData enemyData;
     [SerializeField] protected MovementSettingsSO settingsMovement;
+
     protected Player _player;
     protected IEnemyMovement _movement;
-    
+
     private int _hp;
     private bool _hasArmor;
-    protected bool _isCaught = false;
-    
+    protected bool _isCaught;
+
+    private bool despawnNotified;
+
     public TypeAward AwardType => TypeAward.Money;
     public int AwardValue => enemyData.Award;
-    
-    public event Action<Enemy> OnCollectedEnemy;
+
+    public event Action<Enemy> OnCollectedEnemy; // для наград/эффектов
+    public event Action<Enemy> OnDespawned;      // для спавнера (лимит живых)
 
     public virtual void Awake()
     {
         _hasArmor = enemyData.HasArmor;
+        _hp = enemyData.Hp;
+    }
+
+    public virtual void OnEnable()
+    {
         _isCaught = false;
+        despawnNotified = false;
+
+        _hasArmor = enemyData.HasArmor;
         _hp = enemyData.Hp;
     }
 
@@ -34,7 +46,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     public virtual void Update()
     {
         if (_isCaught) return;
-        _movement.Tick();
+        _movement?.Tick();
     }
 
     protected void ChooseMovementType()
@@ -43,43 +55,42 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         {
             case MovementType.PanicType:
                 _movement = new PanicMove();
-                _movement.Init(this, _player, settingsMovement);
                 break;
-            
+
             case MovementType.LongRangeType:
                 _movement = new LongRangeMove();
-                _movement.Init(this, _player, settingsMovement);
                 break;
-            
+
             case MovementType.MeleeType:
                 _movement = new MeleeMove();
-                _movement.Init(this, _player, settingsMovement);
                 break;
         }
+
+        _movement?.Init(this, _player, settingsMovement);
     }
 
     public virtual CatchResult TryCatch(Transform catcher)
     {
         if (_isCaught) return CatchResult.AlreadyCaught;
         if (_hp > 0) return CatchResult.Resisted;
-        
+
         if (_hasArmor)
-         {
-             BreakArmor();
-             return CatchResult.Resisted;
+        {
+            BreakArmor();
+            return CatchResult.Resisted;
         }
-        
+
         AttachToCatcher(catcher);
         _isCaught = true;
         return CatchResult.Caught;
     }
-    
+
     protected void AttachToCatcher(Transform catcher)
     {
         transform.SetParent(catcher);
         transform.position = catcher.position;
     }
-    
+
     protected void BreakArmor()
     {
         _hasArmor = false;
@@ -89,7 +100,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     public void ApplyDamage(int amount)
     {
         _hp -= amount;
-        // Событие для визуала
+        // TODO: событие для визуала
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -102,9 +113,26 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 
     public void OnCollected()
     {
-        //TODO: Событие для визуала
+        if (despawnNotified) return;
+
         OnCollectedEnemy?.Invoke(this);
         Destroy(gameObject);
     }
-    
+
+    private void OnDestroy()
+    {
+        NotifyDespawnOnce();
+    }
+
+    private void OnDisable()
+    {
+        NotifyDespawnOnce();
+    }
+
+    private void NotifyDespawnOnce()
+    {
+        if (despawnNotified) return;
+        despawnNotified = true;
+        OnDespawned?.Invoke(this);
+    }
 }
