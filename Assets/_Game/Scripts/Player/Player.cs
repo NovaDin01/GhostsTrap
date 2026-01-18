@@ -9,8 +9,13 @@ public class Player : MonoBehaviour, ITakingDamage
     [SerializeField] private float startGridSpeed = 8f;
     [SerializeField] private float startGridRadius = 1.5f;
     [SerializeField] private int startGridCount = 1;
-    [SerializeField] private int startMaxHp = 3;
-    private int currentHp = 3;
+    [SerializeField] private float startTime2Attack = 0.8f;
+    [SerializeField] private int startMaxHp = 10;
+    
+    private int currentHp;
+    private float timerAttack;
+    private float timerAbility;
+    private bool isAbilityActive;
     
     [Header("Ссылки")]
     [SerializeField] private GridNet gridPrefab;
@@ -26,10 +31,12 @@ public class Player : MonoBehaviour, ITakingDamage
     private int _gridCount;
     private float _gridSpeed;
     private float _gridRadius;
+    private float _gridTime2Attack;
     private int _maxHp;
 
     public int MaxHp => _maxHp;
     public int CurrentHp => currentHp;
+    public bool IsAbilityActive => isAbilityActive;
 
     public event Action OnApplyDamage;
     public event Action OnApplyHeal;
@@ -38,6 +45,9 @@ public class Player : MonoBehaviour, ITakingDamage
     {
         if (Instance != null && Instance != this) Destroy(gameObject);
         else Instance = this;
+
+        currentHp = startMaxHp;
+        timerAttack = startTime2Attack;
         
         _trapPosition = transform.position;
 
@@ -45,17 +55,25 @@ public class Player : MonoBehaviour, ITakingDamage
         _gridCount = startGridCount;
         _gridSpeed = startGridSpeed;
         _gridRadius = startGridRadius;
+        _gridTime2Attack = startTime2Attack;
         _maxHp = startMaxHp;
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && _currentGridCount < _gridCount)
+        timerAttack -= Time.deltaTime;
+        timerAbility -= Time.deltaTime;
+        
+        isAbilityActive = timerAbility > 0;
+        
+        if (Input.GetMouseButtonDown(0) && _currentGridCount < _gridCount && timerAttack <= 0)
             GetCoordinates();
+        
     }
 
     private void GetCoordinates() // Получение координат после нажатия ЛКМ
     {
+        timerAttack = _gridTime2Attack;
         _targetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GridCreate();
     }
@@ -88,7 +106,7 @@ public class Player : MonoBehaviour, ITakingDamage
                     break;
                 
                 case TypeAward.Ability:
-                    // abilities.ActivateForSeconds(a.AwardValue);
+                    ActivateAbilities(a.AwardValue);
                     break;
             }
             
@@ -119,6 +137,11 @@ public class Player : MonoBehaviour, ITakingDamage
         Destroy(gridObj);
     }
 
+    public void ActivateAbilities(float time)
+    {
+        timerAbility = time;
+    }
+
 
     public void Heal(int amount)
     {
@@ -132,7 +155,7 @@ public class Player : MonoBehaviour, ITakingDamage
     {
         if (currentHp <= 0)
         {
-            Debug.Log("Death"); // Потом переделать в метод + событие
+            SceneController.Instance.LoadMenu(); // Потом переделать в метод + событие
             return;
         }
         
@@ -157,6 +180,11 @@ public class Player : MonoBehaviour, ITakingDamage
     public void UpgradeGridRadius(float delta)
     {
         _gridRadius = Mathf.Max(0f, _gridRadius + delta);
+    }
+    
+    public void UpgradeGridTime2Attack(float delta)
+    {
+        _gridTime2Attack = Mathf.Max(0f, _gridTime2Attack - delta);
     }
 
     public void UpgradeMaxHp(int delta)

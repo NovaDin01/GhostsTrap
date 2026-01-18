@@ -11,43 +11,43 @@ public enum GridState
 
 public class GridNet : MonoBehaviour
 {
+    [Header("Rope (Line)")]
+    [SerializeField] private LineRenderer rope;
+    [SerializeField] private Vector3 ropeStartOffset; // если нужно сместить начало (из "руки")
+
     private float _speed;
     private float _radius;
     private LayerMask _loots;
     private Vector2 _trap;
     private Vector2 _target;
-    
+
     private GridState _state;
-    
+
     private Collider2D[] _enemies = Array.Empty<Collider2D>();
     private readonly List<Collider2D> _caught = new();
+
     public event Action<GameObject> OnLoot;
     public event Action<GameObject> onBack;
+
+    private void Awake()
+    {
+        // если не назначил в инспекторе — попробуем взять с объекта
+        if (rope == null) rope = GetComponent<LineRenderer>();
+
+        if (rope != null)
+        {
+            rope.positionCount = 2;
+            rope.useWorldSpace = true;
+            rope.enabled = false; // включаем только когда летим/возвращаемся
+        }
+    }
 
     private void Update()
     {
         State();
+        UpdateRope();
     }
 
-    // Состояния ловушки
-    private void State()
-    {
-        switch (_state)
-        {
-            case GridState.Throwing:
-                MoveToTarget();
-                break;
-            
-            case GridState.Returning:
-                MoveToTrap();
-                break;
-            
-            case GridState.Stopping:
-                break;
-        }
-    }
-
-    // Инициализация ловушки
     public void Init(float speed, float radius, LayerMask loots, Vector2 trap, Vector2 target)
     {
         _target = target;
@@ -59,15 +59,33 @@ public class GridNet : MonoBehaviour
         SetDefaultSettings();
     }
 
-    // Установка дефолтных настроек
     private void SetDefaultSettings()
     {
         transform.position = _trap;
-
         _state = GridState.Throwing;
+
+        // включаем леску при вылете
+        if (rope != null) rope.enabled = true;
+        UpdateRope(true);
     }
 
-    // Движение к цели
+    private void State()
+    {
+        switch (_state)
+        {
+            case GridState.Throwing:
+                MoveToTarget();
+                break;
+
+            case GridState.Returning:
+                MoveToTrap();
+                break;
+
+            case GridState.Stopping:
+                break;
+        }
+    }
+
     private void MoveToTarget()
     {
         GridMove(_target);
@@ -78,7 +96,6 @@ public class GridNet : MonoBehaviour
         }
     }
 
-    // Движение к ловушке
     private void MoveToTrap()
     {
         GridMove(_trap);
@@ -86,14 +103,15 @@ public class GridNet : MonoBehaviour
         {
             _state = GridState.Stopping;
             GetLoot();
+
+            // когда вернулись — выключаем леску
+            if (rope != null) rope.enabled = false;
         }
     }
 
-    // Логика поимки
     private void GetCaught()
     {
         _caught.Clear();
-        
         _enemies = Physics2D.OverlapCircleAll(transform.position, _radius, _loots);
 
         foreach (var enemy in _enemies)
@@ -102,12 +120,13 @@ public class GridNet : MonoBehaviour
 
             if (!enemy.TryGetComponent<IObjectAttracted>(out var obj))
                 continue;
-            
-            if(enemy.TryGetComponent<ITakingDamage>(out var takingDamage))
-                takingDamage.ApplyDamage(1); //TODO: "потом добавить переменную";
-            
-            var result = obj.TryCatch(transform);
 
+            if (enemy.TryGetComponent<ITakingDamage>(out var takingDamage))
+            {
+                takingDamage.ApplyDamage(1);
+            }
+
+            var result = obj.TryCatch(transform);
             if (result != CatchResult.Caught)
                 continue;
 
@@ -117,7 +136,6 @@ public class GridNet : MonoBehaviour
         _state = GridState.Returning;
     }
 
-    // Получение лута
     private void GetLoot()
     {
         foreach (var enemy in _caught)
@@ -127,20 +145,31 @@ public class GridNet : MonoBehaviour
             enemy.transform.SetParent(null);
             OnLoot?.Invoke(enemy.gameObject);
         }
+
         onBack?.Invoke(gameObject);
-        
+
         _enemies = Array.Empty<Collider2D>();
         _caught.Clear();
     }
 
-    // Метод - помощник. Проверяет находится ли сеть рядом с point
+    private void UpdateRope(bool force = false)
+    {
+        if (rope == null) return;
+        if (!rope.enabled && !force) return;
+
+        Vector3 start = (Vector3)_trap + ropeStartOffset;
+        Vector3 end = transform.position;
+
+        rope.SetPosition(0, start);
+        rope.SetPosition(1, end);
+    }
+
     private bool ClosingOnTarget(Vector2 point)
     {
         return Vector2.Distance(transform.position, point) < 0.1f;
     }
 
-    // Метод - помощник. Метод движения ловушки к target
-    private void GridMove(Vector2 target) // Метод движения ловушки
+    private void GridMove(Vector2 target)
     {
         transform.position = Vector2.MoveTowards(transform.position, target, _speed * Time.deltaTime);
     }

@@ -54,7 +54,6 @@ public class PlayerHealth : MonoBehaviour
 
     private void MinusHeart()
     {
-        Debug.Log("HEART EVENT");
         for (int i = heartSprites.Count - 1; i >= 0; i--)
         {
             var h = heartSprites[i];

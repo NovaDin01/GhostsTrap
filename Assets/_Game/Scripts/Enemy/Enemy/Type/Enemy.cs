@@ -77,7 +77,12 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         if (_hasArmor)
         {
             BreakArmor();
-            return CatchResult.Resisted;
+            if (!Player.Instance.IsAbilityActive) 
+                return CatchResult.Resisted;
+            
+            AttachToCatcher(catcher);
+            _isCaught = true;
+            return CatchResult.Caught;
         }
 
         AttachToCatcher(catcher);
@@ -100,6 +105,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     public void ApplyDamage(int amount)
     {
         _hp -= amount;
+        Debug.Log($"{_hp}, {amount}");
         // TODO: событие для визуала
     }
 
