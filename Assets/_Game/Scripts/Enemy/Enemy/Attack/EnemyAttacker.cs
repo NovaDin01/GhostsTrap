@@ -67,7 +67,6 @@ public class EnemyAttacker : Enemy
                 _attacker.Tick();
                 if(_attacker is LongRangeAttack)
                     _movement.Tick();
-                Debug.Log("Attack");
                 break;
         }
     }

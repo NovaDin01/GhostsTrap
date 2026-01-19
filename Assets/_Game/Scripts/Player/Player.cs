@@ -148,25 +148,25 @@ public class Player : MonoBehaviour, ITakingDamage
         timerAbility = time;
     }
 
-
     public void Heal(int amount)
     {
         if (currentHp >= _maxHp) return;
         currentHp += amount;
         OnApplyHeal?.Invoke();
     }
-    
 
     public void ApplyDamage(int amount)
     {
+        VisualEffects.Instance.PlayPlayerHit(transform.position);
+        
         if (currentHp <= 0)
         {
             SceneController.Instance.LoadMenu();
             return;
         }
-
         currentHp -= amount;
-
+        
+        
         animator.SetTrigger("Damage");
 
         OnApplyDamage?.Invoke();

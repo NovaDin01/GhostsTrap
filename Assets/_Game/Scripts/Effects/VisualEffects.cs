@@ -6,6 +6,8 @@ public class VisualEffects : MonoBehaviour
 
     [Header("Hit Effects")]
     [SerializeField] private ParticleSystem bulletHitEffect;
+    [SerializeField] private ParticleSystem playerHitEffect;
+    [SerializeField] private ParticleSystem peopleEatEffect;
 
     private void Awake()
     {
@@ -17,6 +19,24 @@ public class VisualEffects : MonoBehaviour
     {
         Instantiate(
             bulletHitEffect,
+            transform,
+            Quaternion.LookRotation(transform)
+        );
+    }
+    
+    public void PlayPlayerHit(Vector3 transform)
+    {
+        Instantiate(
+            playerHitEffect,
+            transform,
+            Quaternion.LookRotation(transform)
+        );
+    }
+    
+    public void PlayPeopleEat(Vector3 transform)
+    {
+        Instantiate(
+            peopleEatEffect,
             transform,
             Quaternion.LookRotation(transform)
         );

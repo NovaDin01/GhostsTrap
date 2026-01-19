@@ -99,14 +99,11 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     protected void BreakArmor()
     {
         _hasArmor = false;
-        Debug.Log("Броня уничтожена");
     }
 
     public void ApplyDamage(int amount)
     {
         _hp -= amount;
-        Debug.Log($"{_hp}, {amount}");
-        // TODO: событие для визуала
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -122,6 +119,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         if (despawnNotified) return;
 
         OnCollectedEnemy?.Invoke(this);
+        VisualEffects.Instance.PlayPeopleEat(transform.position);
         Destroy(gameObject);
     }
 
