@@ -12,6 +12,10 @@ public class Player : MonoBehaviour, ITakingDamage
     [SerializeField] private float startTime2Attack = 0.8f;
     [SerializeField] private int startMaxHp = 10;
     
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
+
+    
     private int currentHp;
     private float timerAttack;
     private float timerAbility;
@@ -112,10 +116,12 @@ public class Player : MonoBehaviour, ITakingDamage
             
             if (loot.TryGetComponent<Enemy>(out var enemy))
             {
+                animator.SetTrigger("GetLoot");
                 enemy.OnCollected();
             }
             else
             {
+                animator.SetTrigger("GetLoot");
                 Destroy(loot); // запасной вариант, если это не Enemy
             }
 
@@ -155,14 +161,17 @@ public class Player : MonoBehaviour, ITakingDamage
     {
         if (currentHp <= 0)
         {
-            SceneController.Instance.LoadMenu(); // ѕотом переделать в метод + событие
+            SceneController.Instance.LoadMenu();
             return;
         }
-        
-        Debug.Log("DAMAGE EVENT");
+
         currentHp -= amount;
+
+        animator.SetTrigger("Damage");
+
         OnApplyDamage?.Invoke();
     }
+
 
     
     //  остыль из-за нехватки времени

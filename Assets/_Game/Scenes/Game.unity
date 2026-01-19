@@ -319,7 +319,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 9184052998252883643, guid: 437a6c8049c6f7c498117738b29dd842, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2893,24 +2893,59 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15ddda480ad64c9b88fc9ee9d429e263, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  _enemiesPrefabs:
-  - {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
-  - {fileID: 2336108599352573318, guid: 2fe1c661c648cdb4a9d86ebc05134605, type: 3}
-  - {fileID: 7278336941537678581, guid: 30dece69d35dab34785b644df38e7da6, type: 3}
-  _scientistSpawnPoint:
-  - {fileID: 117861404}
-  - {fileID: 1844997110}
-  - {fileID: 1438563039}
-  - {fileID: 749006167}
-  _soldierSpawnPoint:
-  - {fileID: 127401258}
-  - {fileID: 791333182}
-  - {fileID: 300455787}
-  - {fileID: 365785301}
-  - {fileID: 879987926}
-  - {fileID: 1233051739}
-  player: {fileID: 2138226568}
-  spawnCooldown: 0
+  _locations:
+  - location: 0
+    enemies:
+    - prefab: {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
+      role: 0
+      weight: 50
+    - prefab: {fileID: 7278336941537678581, guid: 30dece69d35dab34785b644df38e7da6, type: 3}
+      role: 1
+      weight: 25
+    - prefab: {fileID: 2336108599352573318, guid: 2fe1c661c648cdb4a9d86ebc05134605, type: 3}
+      role: 1
+      weight: 25
+    scientistSpawnPoints:
+    - {fileID: 117861404}
+    - {fileID: 1844997110}
+    - {fileID: 1438563039}
+    - {fileID: 749006167}
+    soldierSpawnPoints:
+    - {fileID: 127401258}
+    - {fileID: 791333182}
+    - {fileID: 300455787}
+    - {fileID: 365785301}
+    - {fileID: 879987926}
+    - {fileID: 1233051739}
+    allCountPerLvl: 04000000060000000a0000000c000000
+    spawnCooldownPerLvl:
+    - 2
+    - 1.5
+    - 1
+    - 0.5
+  - location: 0
+    enemies: []
+    scientistSpawnPoints: []
+    soldierSpawnPoints: []
+    allCountPerLvl: 
+    spawnCooldownPerLvl: []
+  - location: 0
+    enemies: []
+    scientistSpawnPoints: []
+    soldierSpawnPoints: []
+    allCountPerLvl: 
+    spawnCooldownPerLvl: []
+  - location: 0
+    enemies: []
+    scientistSpawnPoints: []
+    soldierSpawnPoints: []
+    allCountPerLvl: 
+    spawnCooldownPerLvl: []
+  _player: {fileID: 2138226568}
+  _roundDuration: 120
+  _levelInterval: 30
+  _maxTimerLvl: 4
+  _transitionDelay: 1
 --- !u!1 &788755128
 GameObject:
   m_ObjectHideFlags: 0
@@ -3517,6 +3552,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1057996294}
   - component: {fileID: 1057996295}
+  - component: {fileID: 1057996296}
   m_Layer: 0
   m_Name: '[SYSTEM]'
   m_TagString: Untagged
@@ -3641,6 +3677,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1057996296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057996293}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b471c49d5e56444f81d792417bdbb50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VisualEffects
+  bulletHitEffect: {fileID: 9208442164227617347, guid: 58dc08ca52ad8294ab9754ec9d3cfe2d, type: 3}
 --- !u!1 &1106414264
 GameObject:
   m_ObjectHideFlags: 0
@@ -6429,6 +6478,7 @@ MonoBehaviour:
   startGridCount: 1
   startTime2Attack: 0.8
   startMaxHp: 10
+  animator: {fileID: 2138226571}
   gridPrefab: {fileID: -2401509042453229422, guid: d90a16f49823d464db89458cd6b171f7, type: 3}
   lootsMask:
     serializedVersion: 2
@@ -6495,17 +6545,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.012941912, y: 0}
+  m_Offset: {x: -0.011697181, y: -0.004978895}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.54, y: 0.48}
+    oldSize: {x: 0.6, y: 0.64}
     newSize: {x: 0.24, y: 0.56}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.5211874, y: 0.52}
+  m_Size: {x: 0.4390359, y: 0.40548575}
   m_EdgeRadius: 0
 --- !u!95 &2138226571
 Animator:

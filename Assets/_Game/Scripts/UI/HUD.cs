@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 
@@ -9,7 +8,22 @@ public class HUD : MonoBehaviour
 
     private void Update()
     {
-        timer.text = EnemySpawner.Instance.TimerTime.ToString("0:00");
+        UpdateTimer();
+        UpdateMoney();
+    }
+
+    private void UpdateTimer()
+    {
+        float time = Mathf.Max(0f, EnemySpawner.Instance.RemainingTime);
+
+        int minutes = Mathf.FloorToInt(time / 60f);
+        int seconds = Mathf.FloorToInt(time % 60f);
+
+        timer.text = $"{minutes:0}:{seconds:00}";
+    }
+
+    private void UpdateMoney()
+    {
         money.text = MoneySystem.Instance.Wallet.ToString("N0");
     }
 }

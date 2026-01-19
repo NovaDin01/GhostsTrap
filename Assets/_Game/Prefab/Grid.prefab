@@ -106,10 +106,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83b9171a198155741974df8e21eba75b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Grid
-  rotateAngleOffset: -60
   rope: {fileID: 8566771101248359527}
-  ropeAttach: {fileID: 1268580625469691456}
-  ropeVisibleOnlyInFlight: 1
+  ropeStartOffset: {x: 0, y: 0, z: 0}
 --- !u!120 &8566771101248359527
 LineRenderer:
   serializedVersion: 3
@@ -136,7 +134,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: ad76bf2e14b486947b3a0baef2593e46, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -214,11 +212,11 @@ LineRenderer:
     numCapVertices: 0
     alignment: 0
     textureMode: 0
-    textureScale: {x: 1, y: 1}
+    textureScale: {x: 10, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
   m_UseWorldSpace: 1
-  m_Loop: 0
+  m_Loop: 1
   m_ApplyActiveColorSpace: 1
 --- !u!1 &6334857151688203958
 GameObject:

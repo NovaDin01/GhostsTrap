@@ -18,9 +18,6 @@ public class Bullet : MonoBehaviour
 
     private void Update()
     {
-        Quaternion targetRotation = Quaternion.LookRotation(_player.transform.position);
-        transform.rotation = targetRotation;
-        
         float step = _setting.BulletSpeed * Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position,
             _player.transform.position, step);
@@ -31,11 +28,13 @@ public class Bullet : MonoBehaviour
         if (other.gameObject.TryGetComponent<Player>(out var player))
         {
             player.ApplyDamage(_setting.Damage);
+            VisualEffects.Instance.PlayBulletHit(transform.position);
             Destroy(gameObject);
         }
 
         if (other.gameObject.TryGetComponent<Grid>(out var grid))
         {
+            VisualEffects.Instance.PlayBulletHit(transform.position);
             Destroy(gameObject);
         }
     }

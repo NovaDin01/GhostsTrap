@@ -6,202 +6,319 @@ using Random = UnityEngine.Random;
 public enum Location
 {
     Lab,
-    forest,
-    river
+    Office,
+    MilitaryBase,
+    Forest
 }
 
 public class EnemySpawner : MonoBehaviour
 {
     public static EnemySpawner Instance;
+
+    public enum EnemyRole
+    {
+        Scientist,
+        Soldier
+    }
+
+    [Serializable]
+    public class EnemyEntry
+    {
+        public Enemy prefab;
+        public EnemyRole role = EnemyRole.Soldier;
+        [Min(0f)] public float weight = 1f;
+    }
+
+
+    [Serializable]
+    public class LocationConfig
+    {
+        public Location location;
+
+        [Header("Кого спавним в этой локации")]
+        public List<EnemyEntry> enemies = new();
+
+        [Header("Точки спавна")]
+        public List<Transform> scientistSpawnPoints = new();
+        public List<Transform> soldierSpawnPoints = new();
+
+        [Header("Ограничение по количеству (по уровням таймера 1..4)")]
+        public int[] allCountPerLvl = new int[4] { 10, 15, 24, 30 };
+
+        [Header("КД спавна (по уровням таймера 1..4)")]
+        public float[] spawnCooldownPerLvl = new float[4] { 3f, 2f, 1.5f, 1f };
+    }
+
+
+    [Header("Configs")]
+    [SerializeField] private List<LocationConfig> _locations = new();
+
+    [Header("Runtime refs")]
+    [SerializeField] private Player _player;
+
+    [Header("Timer settings")]
+    [SerializeField] private float _roundDuration = 120f;   // 2 минуты
+    [SerializeField] private float _levelInterval = 30f;    // каждые 30 секунд +1 lvl
+    [SerializeField] private int _maxTimerLvl = 4;          // 1..4
+    [SerializeField] private float _transitionDelay = 1.0f; // сколько длится анимация перехода
+
+
+    // events
+    public event Action<int> OnTimerLevelChanged;           // когда lvl повысился
+    public event Action<float> OnTimerTick;                // если надо UI (остаток времени)
+    public event Action<Location> OnLocationStarted;        // локация стартовала
+    public event Action<Location> OnLocationFinished;       // 2 минуты закончились (перед переходом)
     
-    [SerializeField] private List<Enemy> _enemiesPrefabs;
-    [SerializeField] private List<Transform> _scientistSpawnPoint;
-    [SerializeField] private List<Transform> _soldierSpawnPoint;
-    [SerializeField] private Player player;
 
-    [Header("Количество врагов")]
-    private int allCount;
-    private int currentCount;
+    public float RemainingTime => _remainingTime;
+    public int TimerLvl => _timerLvl;
+    public Location CurrentLocation => _currentLocation;
 
-    [Header("Кулдаун спавна")]
-    [SerializeField] private float spawnCooldown;
+    private Location _currentLocation;
+    private LocationConfig _currentConfig;
 
-    private float spawnTime;
+    private float _remainingTime;
+    private float _spawnTimer;
 
-    [Header("Кулдаун Таймера")]
-    private float levelUpCooldown;
-    private int timerLvl;
-    private float timerTime;
-    
-    private Location _location;
+    private int _timerLvl;         // 1..4
+    private int _currentCount;
+    private int _allCount;
+    private float _spawnCooldown;
 
-    [Header("Вероятность спавна")]
-    private float rareScientist;
-    private float rareSoilderBaton;
-    private float rareSoilderRifle;
-
-    private int index;
-
-    public float TimerTime => timerTime;
+    private bool _spawningEnabled = true;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }
+        // singleton
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
 
-        else
+        if (_player == null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);  
-        }
-        
-        // минимальные проверки, чтобы не падать
-        if (_enemiesPrefabs == null || _enemiesPrefabs.Count < 3)
-        {
-            Debug.LogError("EnemySpawner: нужно минимум 3 префаба врагов (0 ученый, 1 дубинка, 2 автомат).");
+            Debug.LogError("EnemySpawner: Player не назначен в инспекторе.");
             enabled = false;
             return;
         }
 
-        if (_scientistSpawnPoint == null || _scientistSpawnPoint.Count == 0 ||
-            _soldierSpawnPoint == null || _soldierSpawnPoint.Count == 0)
+        if (_locations == null || _locations.Count == 0)
         {
-            Debug.LogError("EnemySpawner: нет точек спавна (ученые/солдаты).");
+            Debug.LogError("EnemySpawner: нет конфигов локаций.");
             enabled = false;
             return;
         }
 
-        timerLvl = 1;
-        _location = Location.Lab;
-
-        ApplyLevelSettings();
-        timerTime = levelUpCooldown;
-        spawnTime = spawnCooldown;
-        //spawnTime = Random.Range(minSpawnCooldown, maxSpawnCooldown);
+        // стартуем с первой локации из списка (или поставь вручную ниже)
+        StartLocation(_locations[0].location);
     }
 
     private void Update()
     {
-        spawnTime -= Time.deltaTime;
-        
-        if(timerLvl < 4)
-            timerTime -= Time.deltaTime;
+        if (!_spawningEnabled) return;
 
-        if (spawnTime <= 0 && currentCount < allCount)
+        // ---- TIMER: 120 -> 0 ----
+        _remainingTime -= Time.deltaTime;
+        OnTimerTick?.Invoke(_remainingTime);
+
+        // вычисляем lvl по прошедшему времени: каждые 30 сек +1
+        float elapsed = _roundDuration - _remainingTime;
+        int computedLvl = Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / _levelInterval), 1, _maxTimerLvl);
+
+        if (computedLvl != _timerLvl)
         {
-            spawnTime = spawnCooldown;
-            //spawnTime = Random.Range(minSpawnCooldown, maxSpawnCooldown);
+            _timerLvl = computedLvl;
+            ApplyLevelSettings(_timerLvl);
+            OnTimerLevelChanged?.Invoke(_timerLvl);
+        }
+
+        // конец раунда (2 минуты)
+        if (_remainingTime <= 0f)
+        {
+            FinishLocation();
+            return;
+        }
+
+        // ---- SPAWN ----
+        _spawnTimer -= Time.deltaTime;
+
+        if (_spawnTimer <= 0f && _currentCount < _allCount)
+        {
+            _spawnTimer = _spawnCooldown;
             Spawn();
         }
+    }
 
-        // ап опасности по времени - как ты и хочешь
-        if (timerTime <= 0)
+    // -------------------- PUBLIC API --------------------
+
+    public void StartLocation(Location location)
+    {
+        _currentLocation = location;
+        _currentConfig = GetConfig(location);
+
+        if (_currentConfig == null)
         {
-            timerLvl++;
-            ApplyLevelSettings();
-            timerTime = levelUpCooldown;
+            Debug.LogError($"EnemySpawner: не найден конфиг для локации {location}");
+            enabled = false;
+            return;
         }
+
+        if ((_currentConfig.scientistSpawnPoints == null || _currentConfig.scientistSpawnPoints.Count == 0) &&
+            (_currentConfig.soldierSpawnPoints == null || _currentConfig.soldierSpawnPoints.Count == 0))
+        {
+            Debug.LogError($"EnemySpawner: у локации {location} нет ни scientistSpawnPoints, ни soldierSpawnPoints.");
+            enabled = false;
+            return;
+        }
+
+
+        if (_currentConfig.enemies == null || _currentConfig.enemies.Count == 0)
+        {
+            Debug.LogError($"EnemySpawner: у локации {location} нет enemies.");
+            enabled = false;
+            return;
+        }
+
+        // reset round
+        _spawningEnabled = true;
+        _remainingTime = _roundDuration;
+        _spawnTimer = 0f;
+
+        _timerLvl = 1;
+        _currentCount = 0;
+
+        ApplyLevelSettings(_timerLvl);
+        OnTimerLevelChanged?.Invoke(_timerLvl);
+        OnLocationStarted?.Invoke(_currentLocation);
+    }
+
+    // вызови это извне, если хочешь принудительно перейти к следующей локации
+    public void GoNextLocation()
+    {
+        Location next = GetNextLocation(_currentLocation);
+        StartLocation(next);
+    }
+
+    // -------------------- CORE --------------------
+
+    private void FinishLocation()
+    {
+        _spawningEnabled = false;
+        OnLocationFinished?.Invoke(_currentLocation);
+
+        // например триггер анимации
+        // _player.PlayTransitionAnimation();
+
+        StartCoroutine(TransitionToNextLocation());
+    }
+
+    private System.Collections.IEnumerator TransitionToNextLocation()
+    {
+        yield return new WaitForSeconds(_transitionDelay);
+        GoNextLocation();
+    }
+
+
+    private void ApplyLevelSettings(int lvl)
+    {
+        int idx = Mathf.Clamp(lvl - 1, 0, _maxTimerLvl - 1);
+
+        // защита от кривых массивов
+        _allCount = GetArrayValueSafe(_currentConfig.allCountPerLvl, idx, 10);
+        _spawnCooldown = GetArrayValueSafe(_currentConfig.spawnCooldownPerLvl, idx, 2f);
     }
 
     private void Spawn()
     {
-        index = PickEnemyIndexByChance();
-        Transform spawnPoint = GetSpawnPointFor(index);
-        Enemy prefab = _enemiesPrefabs[index];
+        EnemyEntry entry = PickEnemyEntryByWeight(_currentConfig.enemies);
+        if (entry == null || entry.prefab == null) return;
 
-        Enemy enemy = Instantiate(prefab, spawnPoint.position, spawnPoint.rotation);
-        enemy.Init(player);
+        Transform sp = GetSpawnPointFor(entry.role);
+        if (sp == null) return;
 
-        currentCount++;
+        Enemy enemy = Instantiate(entry.prefab, sp.position, sp.rotation);
+        enemy.Init(_player);
 
-        enemy.OnCollectedEnemy += OnEnemyCollected;   // если надо награду/эффекты
-        enemy.OnDespawned += OnEnemyDespawned;        
+        _currentCount++;
+        enemy.OnDespawned += OnEnemyDespawned;
     }
-
-    private void OnEnemyCollected(Enemy enemy)
+    
+    private Transform GetSpawnPointFor(EnemyRole role)
     {
-        // тут можно начислить награду/сделать визуал
-        
+        List<Transform> points = (role == EnemyRole.Scientist)
+            ? _currentConfig.scientistSpawnPoints
+            : _currentConfig.soldierSpawnPoints;
+
+        if (points == null || points.Count == 0)
+        {
+            Debug.LogError($"EnemySpawner: нет spawnPoints для роли {role} в локации {_currentLocation}");
+            return null;
+        }
+
+        return points[Random.Range(0, points.Count)];
     }
+
+
 
     private void OnEnemyDespawned(Enemy enemy)
     {
-        enemy.OnCollectedEnemy -= OnEnemyCollected;
         enemy.OnDespawned -= OnEnemyDespawned;
-
-        currentCount = Mathf.Max(0, currentCount - 1);
+        _currentCount = Mathf.Max(0, _currentCount - 1);
     }
 
+    // -------------------- HELPERS --------------------
 
-    private Transform GetSpawnPointFor(int enemyIndex)
+    private LocationConfig GetConfig(Location loc)
     {
-        // 0 = scientist, 1/2 = soldiers
-        if (enemyIndex == 0)
-            return _scientistSpawnPoint[Random.Range(0, _scientistSpawnPoint.Count)];
+        for (int i = 0; i < _locations.Count; i++)
+            if (_locations[i].location == loc)
+                return _locations[i];
 
-        return _soldierSpawnPoint[Random.Range(0, _soldierSpawnPoint.Count)];
+        return null;
     }
 
-    private void ApplyLevelSettings()
+    private static int GetArrayValueSafe(int[] arr, int index, int fallback)
     {
-        // КАП: после 4 уровня оставляем настройки 4-го (уровень может расти бесконечно)
-        int lvl = Mathf.Min(timerLvl, 4);
-
-        switch (lvl)
-        {
-            case 1:
-                levelUpCooldown = 5;
-                rareScientist = 100;
-                rareSoilderBaton = 0;
-                rareSoilderRifle = 0;
-                allCount = 10;
-                spawnCooldown = 3;
-                break;
-
-            case 2:
-                levelUpCooldown = 5;
-                rareScientist = 60;
-                rareSoilderBaton = 40;
-                rareSoilderRifle = 0;
-                allCount = 15;
-                spawnCooldown = 2;
-                break;
-
-            case 3:
-                levelUpCooldown = 5;
-                rareScientist = 55;
-                rareSoilderBaton = 30;
-                rareSoilderRifle = 15;
-                allCount = 24;
-                spawnCooldown = 1.5f;
-                break;
-
-            case 4:
-                levelUpCooldown = 55;
-                rareScientist = 50;
-                rareSoilderBaton = 25;
-                rareSoilderRifle = 25;
-                allCount = 30;
-                spawnCooldown = 1;
-                break;
-        }
+        if (arr == null || arr.Length == 0) return fallback;
+        if (index < 0) index = 0;
+        if (index >= arr.Length) index = arr.Length - 1;
+        return arr[index];
     }
 
-    private int PickEnemyIndexByChance()
+    private static float GetArrayValueSafe(float[] arr, int index, float fallback)
     {
-        float w0 = Mathf.Max(0f, rareScientist);
-        float w1 = Mathf.Max(0f, rareSoilderBaton);
-        float w2 = Mathf.Max(0f, rareSoilderRifle);
+        if (arr == null || arr.Length == 0) return fallback;
+        if (index < 0) index = 0;
+        if (index >= arr.Length) index = arr.Length - 1;
+        return arr[index];
+    }
 
-        float sum = w0 + w1 + w2;
-        if (sum <= 0f) return 0;
+    private static EnemyEntry PickEnemyEntryByWeight(List<EnemyEntry> entries)
+    {
+        if (entries == null || entries.Count == 0) return null;
+
+        float sum = 0f;
+        for (int i = 0; i < entries.Count; i++)
+            sum += Mathf.Max(0f, entries[i].weight);
+
+        if (sum <= 0f) return entries[0];
 
         float roll = Random.Range(0f, sum);
+        float acc = 0f;
 
-        if (roll < w0) return 0;
-        if (roll < w0 + w1) return 1;
-        return 2;
+        for (int i = 0; i < entries.Count; i++)
+        {
+            acc += Mathf.Max(0f, entries[i].weight);
+            if (roll <= acc) return entries[i];
+        }
+
+        return entries[entries.Count - 1];
+    }
+
+    private Location GetNextLocation(Location current)
+    {
+        // порядок берём из enum (или сделай список-очередь, если хочешь ручной порядок)
+        int count = Enum.GetValues(typeof(Location)).Length;
+        int nextIndex = ((int)current + 1) % count;
+        return (Location)nextIndex;
     }
 }
