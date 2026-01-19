@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour, ITakingDamage
 {
@@ -14,6 +15,8 @@ public class Player : MonoBehaviour, ITakingDamage
     
     [Header("Animation")]
     [SerializeField] private Animator animator;
+    
+    [SerializeField] private LayerMask groundMask;
 
     
     private int currentHp;
@@ -27,9 +30,11 @@ public class Player : MonoBehaviour, ITakingDamage
     [Header("Поиск врагов")]
     [SerializeField] private LayerMask lootsMask;
     
+    
     private Vector2 _targetPosition;
     private Vector2 _trapPosition;
     public int _currentGridCount;
+    
     
     [Header("Итоговые переменные после улучшений")]
     private int _gridCount;
@@ -67,13 +72,18 @@ public class Player : MonoBehaviour, ITakingDamage
     {
         timerAttack -= Time.deltaTime;
         timerAbility -= Time.deltaTime;
-        
+
         isAbilityActive = timerAbility > 0;
-        
-        if (Input.GetMouseButtonDown(0) && _currentGridCount < _gridCount && timerAttack <= 0)
+
+        if (Input.GetMouseButtonDown(0)
+            && _currentGridCount < _gridCount
+            && timerAttack <= 0
+            && !EventSystem.current.IsPointerOverGameObject())
+        {
             GetCoordinates();
-        
+        }
     }
+
 
     private void GetCoordinates() // Получение координат после нажатия ЛКМ
     {

@@ -12,6 +12,7 @@ public class WindowsManager : MonoBehaviour
     private void SwitchWindow(GameObject window)
     {
         window.SetActive(!window.activeSelf);
+        PauseManager.Instance.PauseSwitch();
     }
 
 }
