@@ -61,6 +61,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float _levelInterval = 30f;    // каждые 30 секунд +1 lvl
     [SerializeField] private int _maxTimerLvl = 4;          // 1..4
     [SerializeField] private float _transitionDelay = 1.0f; // сколько длится анимация перехода
+    [SerializeField] private bool _startOnAwake = true;
 
 
     // events
@@ -84,6 +85,7 @@ public class EnemySpawner : MonoBehaviour
     private int _currentCount;
     private int _allCount;
     private float _spawnCooldown;
+    private int _currentLocationIndex;
 
     private bool _spawningEnabled = true;
 
@@ -109,7 +111,14 @@ public class EnemySpawner : MonoBehaviour
         }
 
         // стартуем с первой локации из списка (или поставь вручную ниже)
-        StartLocation(_locations[0].location);
+        if (_startOnAwake)
+        {
+            StartFirstLocation();
+        }
+        else
+        {
+            _spawningEnabled = false;
+        }
     }
 
     private void Update()
@@ -121,8 +130,9 @@ public class EnemySpawner : MonoBehaviour
         OnTimerTick?.Invoke(_remainingTime);
 
         // вычисляем lvl по прошедшему времени: каждые 30 сек +1
-        float elapsed = _roundDuration - _remainingTime;
-        int computedLvl = Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / _levelInterval), 1, _maxTimerLvl);
+        float elapsed = Mathf.Clamp(_roundDuration - _remainingTime, 0f, _roundDuration);
+        float effectiveInterval = GetEffectiveLevelInterval();
+        int computedLvl = Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / effectiveInterval), 1, _maxTimerLvl);
 
         if (computedLvl != _timerLvl)
         {
@@ -134,6 +144,7 @@ public class EnemySpawner : MonoBehaviour
         // конец раунда (2 минуты)
         if (_remainingTime <= 0f)
         {
+            _remainingTime = 0f;
             FinishLocation();
             return;
         }
@@ -153,6 +164,7 @@ public class EnemySpawner : MonoBehaviour
     public void StartLocation(Location location)
     {
         _currentLocation = location;
+        _currentLocationIndex = GetLocationIndex(location);
         _currentConfig = GetConfig(location);
 
         if (_currentConfig == null)
@@ -191,11 +203,28 @@ public class EnemySpawner : MonoBehaviour
         OnLocationStarted?.Invoke(_currentLocation);
     }
 
+    public void StartFirstLocation()
+    {
+        if (_locations == null || _locations.Count == 0)
+        {
+            Debug.LogError("EnemySpawner: нет конфигов локаций.");
+            enabled = false;
+            return;
+        }
+
+        StartLocation(_locations[0].location);
+    }
+
     // вызови это извне, если хочешь принудительно перейти к следующей локации
     public void GoNextLocation()
     {
         Location next = GetNextLocation(_currentLocation);
         StartLocation(next);
+    }
+
+    public void SetSpawningEnabled(bool enabled)
+    {
+        _spawningEnabled = enabled;
     }
 
     // -------------------- CORE --------------------
@@ -316,9 +345,47 @@ public class EnemySpawner : MonoBehaviour
 
     private Location GetNextLocation(Location current)
     {
-        // порядок берём из enum (или сделай список-очередь, если хочешь ручной порядок)
+        // порядок берём из списка локаций (если он задан), иначе из enum
+        if (_locations != null && _locations.Count > 0)
+        {
+            int index = GetLocationIndex(current);
+            int nextIndex = (index + 1) % _locations.Count;
+            return _locations[nextIndex].location;
+        }
+
         int count = Enum.GetValues(typeof(Location)).Length;
-        int nextIndex = ((int)current + 1) % count;
-        return (Location)nextIndex;
+        int fallbackIndex = ((int)current + 1) % count;
+        return (Location)fallbackIndex;
+    }
+
+    private int GetLocationIndex(Location location)
+    {
+        if (_locations != null)
+        {
+            for (int i = 0; i < _locations.Count; i++)
+            {
+                if (_locations[i].location == location)
+                {
+                    return i;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private float GetEffectiveLevelInterval()
+    {
+        if (_maxTimerLvl <= 1) return _roundDuration;
+
+        float computedInterval = _roundDuration / (_maxTimerLvl - 1);
+        if (_levelInterval <= 0f) return computedInterval;
+
+        if (_levelInterval * (_maxTimerLvl - 1) > _roundDuration)
+        {
+            return computedInterval;
+        }
+
+        return _levelInterval;
     }
 }

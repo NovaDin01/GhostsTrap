@@ -6,7 +6,10 @@ public class Player : MonoBehaviour, ITakingDamage
 {
     public static Player Instance;
     
-    [Header("Ñòàðòîâûå õàðàêòåðèñòèêè ùóïàëåö")]
+    [SerializeField] private float damageInvulnerabilityDuration = 0.4f;
+    private float damageInvulnerabilityTimer;
+        damageInvulnerabilityTimer -= Time.deltaTime;
+    [Header("Ã‘Ã²Ã Ã°Ã²Ã®Ã¢Ã»Ã¥ ÃµÃ Ã°Ã ÃªÃ²Ã¥Ã°Ã¨Ã±Ã²Ã¨ÃªÃ¨ Ã¹Ã³Ã¯Ã Ã«Ã¥Ã¶")]
     [SerializeField] private float startGridSpeed = 8f;
     [SerializeField] private float startGridRadius = 1.5f;
     [SerializeField] private int startGridCount = 1;
@@ -24,10 +27,10 @@ public class Player : MonoBehaviour, ITakingDamage
     private float timerAbility;
     private bool isAbilityActive;
     
-    [Header("Ññûëêè")]
+    [Header("Ã‘Ã±Ã»Ã«ÃªÃ¨")]
     [SerializeField] private GridNet gridPrefab;
     
-    [Header("Ïîèñê âðàãîâ")]
+    [Header("ÃÃ®Ã¨Ã±Ãª Ã¢Ã°Ã Ã£Ã®Ã¢")]
     [SerializeField] private LayerMask lootsMask;
     
     
@@ -36,7 +39,7 @@ public class Player : MonoBehaviour, ITakingDamage
     public int _currentGridCount;
     
     
-    [Header("Èòîãîâûå ïåðåìåííûå ïîñëå óëó÷øåíèé")]
+    [Header("ÃˆÃ²Ã®Ã£Ã®Ã¢Ã»Ã¥ Ã¯Ã¥Ã°Ã¥Ã¬Ã¥Ã­Ã­Ã»Ã¥ Ã¯Ã®Ã±Ã«Ã¥ Ã³Ã«Ã³Ã·Ã¸Ã¥Ã­Ã¨Ã©")]
     private int _gridCount;
     private float _gridSpeed;
     private float _gridRadius;
@@ -85,7 +88,7 @@ public class Player : MonoBehaviour, ITakingDamage
     }
 
 
-    private void GetCoordinates() // Ïîëó÷åíèå êîîðäèíàò ïîñëå íàæàòèÿ ËÊÌ
+    private void GetCoordinates() // ÃÃ®Ã«Ã³Ã·Ã¥Ã­Ã¨Ã¥ ÃªÃ®Ã®Ã°Ã¤Ã¨Ã­Ã Ã² Ã¯Ã®Ã±Ã«Ã¥ Ã­Ã Ã¦Ã Ã²Ã¨Ã¿ Ã‹ÃŠÃŒ
     {
         timerAttack = _gridTime2Attack;
         _targetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -132,7 +135,7 @@ public class Player : MonoBehaviour, ITakingDamage
             else
             {
                 animator.SetTrigger("GetLoot");
-                Destroy(loot); // çàïàñíîé âàðèàíò, åñëè ýòî íå Enemy
+                Destroy(loot); // Ã§Ã Ã¯Ã Ã±Ã­Ã®Ã© Ã¢Ã Ã°Ã¨Ã Ã­Ã², Ã¥Ã±Ã«Ã¨ Ã½Ã²Ã® Ã­Ã¥ Enemy
             }
 
           
@@ -167,16 +170,19 @@ public class Player : MonoBehaviour, ITakingDamage
 
     public void ApplyDamage(int amount)
     {
+        if (damageInvulnerabilityTimer > 0f) return;
+
         VisualEffects.Instance.PlayPlayerHit(transform.position);
-        
+
+        currentHp -= amount;
+        damageInvulnerabilityTimer = damageInvulnerabilityDuration;
+
         if (currentHp <= 0)
         {
             SceneController.Instance.LoadMenu();
             return;
         }
-        currentHp -= amount;
-        
-        
+
         animator.SetTrigger("Damage");
 
         OnApplyDamage?.Invoke();
@@ -184,7 +190,7 @@ public class Player : MonoBehaviour, ITakingDamage
 
 
     
-    // Êîñòûëü èç-çà íåõâàòêè âðåìåíè
+    // ÃŠÃ®Ã±Ã²Ã»Ã«Ã¼ Ã¨Ã§-Ã§Ã  Ã­Ã¥ÃµÃ¢Ã Ã²ÃªÃ¨ Ã¢Ã°Ã¥Ã¬Ã¥Ã­Ã¨
     
     public void UpgradeGridCount()
     {
