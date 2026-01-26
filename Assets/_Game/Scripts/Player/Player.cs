@@ -6,15 +6,14 @@ public class Player : MonoBehaviour, ITakingDamage
 {
     public static Player Instance;
     
-    [SerializeField] private float damageInvulnerabilityDuration = 0.4f;
-    private float damageInvulnerabilityTimer;
-        damageInvulnerabilityTimer -= Time.deltaTime;
     [Header("Ñòàðòîâûå õàðàêòåðèñòèêè ùóïàëåö")]
     [SerializeField] private float startGridSpeed = 8f;
     [SerializeField] private float startGridRadius = 1.5f;
     [SerializeField] private int startGridCount = 1;
     [SerializeField] private float startTime2Attack = 0.8f;
     [SerializeField] private int startMaxHp = 10;
+    [SerializeField] private float damageInvulnerabilityDuration = 0.4f;
+
     
     [Header("Animation")]
     [SerializeField] private Animator animator;
@@ -26,6 +25,8 @@ public class Player : MonoBehaviour, ITakingDamage
     private float timerAttack;
     private float timerAbility;
     private bool isAbilityActive;
+    private float damageInvulnerabilityTimer;
+
     
     [Header("Ññûëêè")]
     [SerializeField] private GridNet gridPrefab;
@@ -75,6 +76,8 @@ public class Player : MonoBehaviour, ITakingDamage
     {
         timerAttack -= Time.deltaTime;
         timerAbility -= Time.deltaTime;
+        damageInvulnerabilityTimer -= Time.deltaTime;
+
 
         isAbilityActive = timerAbility > 0;
 
@@ -176,6 +179,7 @@ public class Player : MonoBehaviour, ITakingDamage
 
         currentHp -= amount;
         damageInvulnerabilityTimer = damageInvulnerabilityDuration;
+        
 
         if (currentHp <= 0)
         {

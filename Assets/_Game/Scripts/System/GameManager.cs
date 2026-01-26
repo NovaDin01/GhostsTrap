@@ -1,15 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
+    [Header("Systems")]
     [SerializeField] private EnemySpawner enemySpawner;
-    [SerializeField] private BarrelSpawner barrelSpawner;
-    [SerializeField] private Player player;
-    [SerializeField] private bool startOnAwake = true;
+    [SerializeField] private List<MonoBehaviour> systemsToEnable = new();
 
-    private bool isGameRunning;
+    private bool _hasStarted;
 
     private void Awake()
     {
@@ -22,44 +22,32 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        if (startOnAwake)
+        for (int i = 0; i < systemsToEnable.Count; i++)
         {
-            StartGame();
-        }
-        else
-        {
-            SetGameplayActive(false);
+            if (systemsToEnable[i] != null)
+            {
+                systemsToEnable[i].enabled = false;
+            }
         }
     }
 
     public void StartGame()
     {
-        if (isGameRunning) return;
-        isGameRunning = true;
+        if (_hasStarted) return;
+        _hasStarted = true;
 
-        SetGameplayActive(true);
-
-        if (enemySpawner != null)
+        for (int i = 0; i < systemsToEnable.Count; i++)
         {
-            enemySpawner.StartFirstLocation();
-        }
-    }
-
-    private void SetGameplayActive(bool isActive)
-    {
-        if (player != null)
-        {
-            player.enabled = isActive;
+            if (systemsToEnable[i] != null)
+            {
+                systemsToEnable[i].enabled = true;
+            }
         }
 
-        if (barrelSpawner != null)
+        var spawner = enemySpawner != null ? enemySpawner : EnemySpawner.Instance;
+        if (spawner != null)
         {
-            barrelSpawner.enabled = isActive;
-        }
-
-        if (enemySpawner != null)
-        {
-            enemySpawner.SetSpawningEnabled(isActive);
+            spawner.StartGame();
         }
     }
 }

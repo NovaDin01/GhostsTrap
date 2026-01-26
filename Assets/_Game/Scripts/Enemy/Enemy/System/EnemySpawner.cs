@@ -61,7 +61,6 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float _levelInterval = 30f;    // каждые 30 секунд +1 lvl
     [SerializeField] private int _maxTimerLvl = 4;          // 1..4
     [SerializeField] private float _transitionDelay = 1.0f; // сколько длится анимация перехода
-    [SerializeField] private bool _startOnAwake = true;
 
 
     // events
@@ -69,7 +68,7 @@ public class EnemySpawner : MonoBehaviour
     public event Action<float> OnTimerTick;                // если надо UI (остаток времени)
     public event Action<Location> OnLocationStarted;        // локация стартовала
     public event Action<Location> OnLocationFinished;       // 2 минуты закончились (перед переходом)
-    
+
 
     public float RemainingTime => _remainingTime;
     public int TimerLvl => _timerLvl;
@@ -85,9 +84,9 @@ public class EnemySpawner : MonoBehaviour
     private int _currentCount;
     private int _allCount;
     private float _spawnCooldown;
-    private int _currentLocationIndex;
 
     private bool _spawningEnabled = true;
+    private bool _hasStarted;
 
     private void Awake()
     {
@@ -109,30 +108,23 @@ public class EnemySpawner : MonoBehaviour
             enabled = false;
             return;
         }
-
-        // стартуем с первой локации из списка (или поставь вручную ниже)
-        if (_startOnAwake)
-        {
-            StartFirstLocation();
-        }
-        else
-        {
-            _spawningEnabled = false;
-        }
+        
+        _spawningEnabled = false;
     }
 
     private void Update()
     {
         if (!_spawningEnabled) return;
 
-        // ---- TIMER: 120 -> 0 ----
-        _remainingTime -= Time.deltaTime;
+// ---- TIMER: 120 -> 0 ----
+        _remainingTime = Mathf.Max(0f, _remainingTime - Time.deltaTime);
         OnTimerTick?.Invoke(_remainingTime);
 
         // вычисляем lvl по прошедшему времени: каждые 30 сек +1
-        float elapsed = Mathf.Clamp(_roundDuration - _remainingTime, 0f, _roundDuration);
-        float effectiveInterval = GetEffectiveLevelInterval();
-        int computedLvl = Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / effectiveInterval), 1, _maxTimerLvl);
+        float elapsed = _roundDuration - _remainingTime;
+        int computedLvl = _levelInterval > 0f
+            ? Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / _levelInterval), 1, _maxTimerLvl)
+            : 1;
 
         if (computedLvl != _timerLvl)
         {
@@ -144,7 +136,6 @@ public class EnemySpawner : MonoBehaviour
         // конец раунда (2 минуты)
         if (_remainingTime <= 0f)
         {
-            _remainingTime = 0f;
             FinishLocation();
             return;
         }
@@ -161,10 +152,16 @@ public class EnemySpawner : MonoBehaviour
 
     // -------------------- PUBLIC API --------------------
 
+    public void StartGame()
+    {
+        if (_hasStarted) return;
+        _hasStarted = true;
+        StartLocation(_locations[0].location);
+    }
+
     public void StartLocation(Location location)
     {
         _currentLocation = location;
-        _currentLocationIndex = GetLocationIndex(location);
         _currentConfig = GetConfig(location);
 
         if (_currentConfig == null)
@@ -203,28 +200,11 @@ public class EnemySpawner : MonoBehaviour
         OnLocationStarted?.Invoke(_currentLocation);
     }
 
-    public void StartFirstLocation()
-    {
-        if (_locations == null || _locations.Count == 0)
-        {
-            Debug.LogError("EnemySpawner: нет конфигов локаций.");
-            enabled = false;
-            return;
-        }
-
-        StartLocation(_locations[0].location);
-    }
-
     // вызови это извне, если хочешь принудительно перейти к следующей локации
     public void GoNextLocation()
     {
         Location next = GetNextLocation(_currentLocation);
         StartLocation(next);
-    }
-
-    public void SetSpawningEnabled(bool enabled)
-    {
-        _spawningEnabled = enabled;
     }
 
     // -------------------- CORE --------------------
@@ -270,7 +250,7 @@ public class EnemySpawner : MonoBehaviour
         _currentCount++;
         enemy.OnDespawned += OnEnemyDespawned;
     }
-    
+
     private Transform GetSpawnPointFor(EnemyRole role)
     {
         List<Transform> points = (role == EnemyRole.Scientist)
@@ -345,47 +325,18 @@ public class EnemySpawner : MonoBehaviour
 
     private Location GetNextLocation(Location current)
     {
-        // порядок берём из списка локаций (если он задан), иначе из enum
         if (_locations != null && _locations.Count > 0)
         {
-            int index = GetLocationIndex(current);
-            int nextIndex = (index + 1) % _locations.Count;
-            return _locations[nextIndex].location;
-        }
-
-        int count = Enum.GetValues(typeof(Location)).Length;
-        int fallbackIndex = ((int)current + 1) % count;
-        return (Location)fallbackIndex;
-    }
-
-    private int GetLocationIndex(Location location)
-    {
-        if (_locations != null)
-        {
-            for (int i = 0; i < _locations.Count; i++)
+            int currentIndex = _locations.FindIndex(config => config.location == current);
+            if (currentIndex >= 0)
             {
-                if (_locations[i].location == location)
-                {
-                    return i;
-                }
+                int nextIndex = (currentIndex + 1) % _locations.Count;
+                return _locations[nextIndex].location;
             }
         }
 
-        return 0;
-    }
-
-    private float GetEffectiveLevelInterval()
-    {
-        if (_maxTimerLvl <= 1) return _roundDuration;
-
-        float computedInterval = _roundDuration / (_maxTimerLvl - 1);
-        if (_levelInterval <= 0f) return computedInterval;
-
-        if (_levelInterval * (_maxTimerLvl - 1) > _roundDuration)
-        {
-            return computedInterval;
-        }
-
-        return _levelInterval;
+        int count = Enum.GetValues(typeof(Location)).Length;
+        int enumIndex = ((int)current + 1) % count;
+        return (Location)enumIndex;
     }
 }

@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 4258938827430594705}
   - component: {fileID: 7278336941537678581}
   - component: {fileID: 8506221298191396886}
-  - component: {fileID: -6509705706775393490}
   - component: {fileID: -6212727947870360111}
   m_Layer: 3
   m_Name: RifleSolider
@@ -185,22 +184,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!111 &-6509705706775393490
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1865814702341797104}
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 08525840b7404904f917974afd02fe51, type: 2}
-  m_Animations: []
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_UpdateMode: 0
-  m_CullingType: 0
 --- !u!95 &-6212727947870360111
 Animator:
   serializedVersion: 7
