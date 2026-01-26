@@ -65,9 +65,11 @@ public class FlaskStartController : MonoBehaviour
 
     private void StartGame()
     {
-        Debug.Log("Игра началась");
-
-        // Примеры:
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.StartGame();
+        }
+        // ГЏГ°ГЁГ¬ГҐГ°Г»:
         Time.timeScale = 1f;
         // GameManager.Instance.StartGame();
         // EnemySpawner.Instance.Enable();

@@ -86,6 +86,7 @@ public class EnemySpawner : MonoBehaviour
     private float _spawnCooldown;
 
     private bool _spawningEnabled = true;
+    private bool _hasStarted;
 
     private void Awake()
     {
@@ -108,8 +109,7 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        // стартуем с первой локации из списка (или поставь вручную ниже)
-        StartLocation(_locations[0].location);
+        _spawningEnabled = false;
     }
 
     private void Update()
@@ -117,12 +117,14 @@ public class EnemySpawner : MonoBehaviour
         if (!_spawningEnabled) return;
 
         // ---- TIMER: 120 -> 0 ----
-        _remainingTime -= Time.deltaTime;
+        _remainingTime = Mathf.Max(0f, _remainingTime - Time.deltaTime);
         OnTimerTick?.Invoke(_remainingTime);
 
         // вычисляем lvl по прошедшему времени: каждые 30 сек +1
         float elapsed = _roundDuration - _remainingTime;
-        int computedLvl = Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / _levelInterval), 1, _maxTimerLvl);
+        int computedLvl = _levelInterval > 0f
+            ? Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / _levelInterval), 1, _maxTimerLvl)
+            : 1;
 
         if (computedLvl != _timerLvl)
         {
@@ -149,6 +151,13 @@ public class EnemySpawner : MonoBehaviour
     }
 
     // -------------------- PUBLIC API --------------------
+
+    public void StartGame()
+    {
+        if (_hasStarted) return;
+        _hasStarted = true;
+        StartLocation(_locations[0].location);
+    }
 
     public void StartLocation(Location location)
     {
@@ -316,9 +325,18 @@ public class EnemySpawner : MonoBehaviour
 
     private Location GetNextLocation(Location current)
     {
-        // порядок берём из enum (или сделай список-очередь, если хочешь ручной порядок)
+        if (_locations != null && _locations.Count > 0)
+        {
+            int currentIndex = _locations.FindIndex(config => config.location == current);
+            if (currentIndex >= 0)
+            {
+                int nextIndex = (currentIndex + 1) % _locations.Count;
+                return _locations[nextIndex].location;
+            }
+        }
+
         int count = Enum.GetValues(typeof(Location)).Length;
-        int nextIndex = ((int)current + 1) % count;
-        return (Location)nextIndex;
+        int enumIndex = ((int)current + 1) % count;
+        return (Location)enumIndex;
     }
 }
