@@ -118,13 +118,10 @@ public class GridNet : MonoBehaviour
         {
             if (enemy == null) continue;
 
-            if (!enemy.TryGetComponent<IObjectAttracted>(out var obj))
-                continue;
+            if (!enemy.TryGetComponent<IObjectAttracted>(out var obj)) continue;
 
-            if (enemy.TryGetComponent<ITakingDamage>(out var takingDamage))
-            {
-                takingDamage.ApplyDamage(1);
-            }
+            if (enemy.TryGetComponent<ITakingDamage>(out var takingDamage)) takingDamage.ApplyDamage(1);
+            
 
             var result = obj.TryCatch(transform);
             if (result != CatchResult.Caught)

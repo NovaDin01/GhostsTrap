@@ -6,7 +6,7 @@ public class Bullet : MonoBehaviour
     private Player _player;
     private Enemy _enemy;
     private LongRangeAttackSO _setting;
-
+    
     public void Init(Player player, Enemy enemy, LongRangeAttackSO setting)
     {
         _enemy = enemy;
@@ -19,8 +19,7 @@ public class Bullet : MonoBehaviour
     private void Update()
     {
         float step = _setting.BulletSpeed * Time.deltaTime;
-        transform.position = Vector3.MoveTowards(transform.position,
-            _player.transform.position, step);
+        transform.position = Vector3.MoveTowards(transform.position, _player.transform.position, step);
     }
 
     private void OnCollisionEnter2D(Collision2D other)

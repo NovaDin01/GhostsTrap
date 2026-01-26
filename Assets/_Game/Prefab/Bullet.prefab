@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7224994910459634236}
   - component: {fileID: 2886976630696606546}
   - component: {fileID: 4720098165273911428}
+  - component: {fileID: 7613195491299171964}
   - component: {fileID: -7652094211894913204}
   - component: {fileID: -3225614336730759545}
   m_Layer: 0
@@ -106,6 +107,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 523c183b4d2a4beb804c0ecef420ea14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
+--- !u!114 &7613195491299171964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7486488262913008201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b2c0a5898244005a2ed75eef0097d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BulletVFX
+  particleSystem: {fileID: 9208442164227617347, guid: 58dc08ca52ad8294ab9754ec9d3cfe2d, type: 3}
 --- !u!61 &-7652094211894913204
 BoxCollider2D:
   m_ObjectHideFlags: 0
