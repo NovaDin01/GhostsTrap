@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7894170845421243272}
   - component: {fileID: 3249809664106641540}
   - component: {fileID: 2065199634225668278}
+  - component: {fileID: -3114349837248269758}
   - component: {fileID: 7679994437399497855}
   m_Layer: 3
   m_Name: Scientist
@@ -182,6 +183,23 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!111 &-3114349837248269758
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8112493171770542096}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 08525840b7404904f917974afd02fe51, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 1c260fd7e5fae924ab839c330dadb613, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!95 &7679994437399497855
 Animator:
   serializedVersion: 7
