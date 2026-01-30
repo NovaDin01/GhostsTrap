@@ -22,7 +22,7 @@ public class DefeatWindow : MonoBehaviour
             if (moneyText != null)
             {
                 moneyText.text = MoneySystem.Instance != null
-                    ? MoneySystem.Instance.Wallet.ToString("N0")
+                    ? MoneySystem.Instance.TotalEarned.ToString("N0")
                     : "0";
             }
 

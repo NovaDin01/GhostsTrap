@@ -106,6 +106,10 @@ public class GameRunManager : MonoBehaviour
     {
         _runEnded = false;
         _stats.StartRun();
+        if (MoneySystem.Instance != null)
+        {
+            MoneySystem.Instance.ResetRun();
+        }
     }
 
     private void HandleEnemySpawned(Enemy enemy)
