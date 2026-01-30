@@ -3,6 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class GameStats
 {
+    public int MoneyEarned { get; private set; }
     public int EnemiesSpawned { get; private set; }
     public int EnemiesCollected { get; private set; }
     public int LocationsCompleted { get; private set; }
@@ -15,6 +16,7 @@ public class GameStats
     {
         _startTime = Time.time;
         _isRunning = true;
+        MoneyEarned = 0;
         EnemiesSpawned = 0;
         EnemiesCollected = 0;
         LocationsCompleted = 0;
@@ -44,5 +46,11 @@ public class GameStats
     {
         if (!_isRunning) return;
         LocationsCompleted++;
+    }
+
+    public void RegisterMoneyEarned(int amount)
+    {
+        if (!_isRunning) return;
+        MoneyEarned += amount;
     }
 }

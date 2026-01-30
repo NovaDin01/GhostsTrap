@@ -21,9 +21,7 @@ public class DefeatWindow : MonoBehaviour
         {
             if (moneyText != null)
             {
-                moneyText.text = MoneySystem.Instance != null
-                    ? MoneySystem.Instance.Wallet.ToString("N0")
-                    : "0";
+                moneyText.text = stats.MoneyEarned.ToString("N0");
             }
 
             if (enemiesSpawnedText != null)

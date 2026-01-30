@@ -16,6 +16,8 @@ public class GameRunManager : MonoBehaviour
     private bool _runEnded;
     private bool _playerSubscribed;
     private bool _spawnerSubscribed;
+    private bool _moneySubscribed;
+    private MoneySystem _moneySystem;
 
     private void Awake()
     {
@@ -57,6 +59,11 @@ public class GameRunManager : MonoBehaviour
         {
             player = Player.Instance;
         }
+
+        if (_moneySystem == null)
+        {
+            _moneySystem = MoneySystem.Instance;
+        }
     }
 
     private void Update()
@@ -83,6 +90,12 @@ public class GameRunManager : MonoBehaviour
             enemySpawner.OnRunCompleted += HandleRunCompleted;
             _spawnerSubscribed = true;
         }
+
+        if (_moneySystem != null && !_moneySubscribed)
+        {
+            _moneySystem.OnMoneyAdded += HandleMoneyAdded;
+            _moneySubscribed = true;
+        }
     }
 
     private void Unsubscribe()
@@ -99,6 +112,12 @@ public class GameRunManager : MonoBehaviour
             enemySpawner.OnLocationsCompleted -= HandleLocationCompleted;
             enemySpawner.OnRunCompleted -= HandleRunCompleted;
             _spawnerSubscribed = false;
+        }
+
+        if (_moneySystem != null && _moneySubscribed)
+        {
+            _moneySystem.OnMoneyAdded -= HandleMoneyAdded;
+            _moneySubscribed = false;
         }
     }
 
@@ -130,6 +149,11 @@ public class GameRunManager : MonoBehaviour
     private void HandleLocationCompleted(int completed)
     {
         _stats.RegisterLocationCompleted();
+    }
+
+    private void HandleMoneyAdded(int amount)
+    {
+        _stats.RegisterMoneyEarned(amount);
     }
 
     private void HandleRunCompleted()

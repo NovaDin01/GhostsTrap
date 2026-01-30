@@ -5,6 +5,7 @@ public class MoneySystem : MonoBehaviour
 {
     public static MoneySystem Instance;
     public event Action OnMoneyChanged;
+    public event Action<int> OnMoneyAdded;
 
     private int _wallet;
     public int Wallet => _wallet;
@@ -25,6 +26,7 @@ public class MoneySystem : MonoBehaviour
     public void Add(int amount)
     {
         _wallet += amount;
+        OnMoneyAdded?.Invoke(amount);
         OnMoneyChanged?.Invoke();
     }
 
