@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using _Game.Scripts.Data;
 using UnityEngine;
 
@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 {
     [SerializeField] protected EnemyData enemyData;
     [SerializeField] protected MovementSettingsSO settingsMovement;
+    [SerializeField] private EnemyFeedbacks feedbacks;
 
     protected Player _player;
     protected IEnemyMovement _movement;
@@ -13,6 +14,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     private int _hp;
     private bool _hasArmor;
     protected bool _isCaught;
+    private bool _isDefeated;
 
     private bool despawnNotified;
 
@@ -21,11 +23,14 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 
     public event Action<Enemy> OnCollectedEnemy; // для наград/эффектов
     public event Action<Enemy> OnDespawned;      // для спавнера (лимит живых)
+    public EnemyFeedbacks Feedbacks => feedbacks;
 
     public virtual void Awake()
     {
         _hasArmor = enemyData.HasArmor;
         _hp = enemyData.Hp;
+        _isDefeated = false;
+        CacheFeedbacks();
     }
 
     public virtual void OnEnable()
@@ -35,6 +40,9 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 
         _hasArmor = enemyData.HasArmor;
         _hp = enemyData.Hp;
+        _isDefeated = false;
+        CacheFeedbacks();
+        feedbacks?.PlaySpawn();
     }
 
     public virtual void Init(Player player)
@@ -82,12 +90,27 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
             
             AttachToCatcher(catcher);
             _isCaught = true;
+            feedbacks?.PlayCaught();
             return CatchResult.Caught;
         }
 
         AttachToCatcher(catcher);
         _isCaught = true;
+        feedbacks?.PlayCaught();
         return CatchResult.Caught;
+    }
+
+    private void CacheFeedbacks()
+    {
+        if (feedbacks == null)
+        {
+            feedbacks = GetComponentInChildren<EnemyFeedbacks>();
+        }
+
+        if (feedbacks != null && enemyData != null && enemyData.FeedbackConfig != null)
+        {
+            feedbacks.ApplyConfig(enemyData.FeedbackConfig);
+        }
     }
 
     protected void AttachToCatcher(Transform catcher)
@@ -99,11 +122,19 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     protected void BreakArmor()
     {
         _hasArmor = false;
+        feedbacks?.PlayArmorBreak();
     }
 
     public void ApplyDamage(int amount)
     {
         _hp -= amount;
+        feedbacks?.PlayHit();
+
+        if (_hp <= 0 && !_isDefeated)
+        {
+            _isDefeated = true;
+            feedbacks?.PlayDeath();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)

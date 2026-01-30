@@ -63,6 +63,7 @@ public class LongRangeAttack : IEnemyAttacker
     
     private void FireOneBullet()
     {
+        _enemy.Feedbacks?.PlayAttack();
         var bullet = UnityEngine.Object.Instantiate(_setting.Bullet);
         bullet.Init(_player, _enemy, _setting);
     }
