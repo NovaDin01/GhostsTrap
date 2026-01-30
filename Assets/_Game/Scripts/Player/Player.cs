@@ -29,6 +29,7 @@ public class Player : MonoBehaviour, ITakingDamage
     private float timerAbility;
     private bool isAbilityActive;
     private float damageInvulnerabilityTimer;
+    private bool _isDead;
 
     
     [Header("Ññûëêè")]
@@ -74,6 +75,7 @@ public class Player : MonoBehaviour, ITakingDamage
         _gridRadius = startGridRadius;
         _gridTime2Attack = startTime2Attack;
         _maxHp = startMaxHp;
+        _isDead = false;
     }
 
     private void Update()
@@ -201,23 +203,26 @@ public class Player : MonoBehaviour, ITakingDamage
 
     public void ApplyDamage(int amount)
     {
+        if (_isDead) return;
         if (damageInvulnerabilityTimer > 0f) return;
+        if (amount <= 0) return;
 
         VisualEffects.Instance.PlayPlayerHit(transform.position);
 
-        currentHp -= amount;
+        currentHp = Mathf.Max(0, currentHp - amount);
         damageInvulnerabilityTimer = damageInvulnerabilityDuration;
         
 
+        OnApplyDamage?.Invoke();
+
         if (currentHp <= 0)
         {
+            _isDead = true;
             OnDied?.Invoke();
             return;
         }
 
         animator.SetTrigger("Damage");
-
-        OnApplyDamage?.Invoke();
     }
 
 

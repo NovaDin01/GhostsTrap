@@ -55,11 +55,9 @@ public class EnemySpawner : MonoBehaviour
         [Header("Стартовая точка игрока")]
         public Transform playerSpawnPoint;
 
-        [Header("Ограничение по количеству (по уровням таймера 1..4)")]
-        public int[] allCountPerLvl = new int[4] { 10, 15, 24, 30 };
-
-        [Header("КД спавна (по уровням таймера 1..4)")]
-        public float[] spawnCooldownPerLvl = new float[4] { 3f, 2f, 1.5f, 1f };
+        [Header("Дефолтные настройки спавна (если нет этапов таймера)")]
+        public int defaultMaxAlive = 10;
+        public float defaultSpawnCooldown = 2f;
 
         [Header("Настройки этапов таймера (по уровням 1..4)")]
         public List<TimerStageConfig> timerStages = new();
@@ -343,9 +341,8 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        // защита от кривых массивов
-        _allCount = GetArrayValueSafe(_currentConfig.allCountPerLvl, idx, 10);
-        _spawnCooldown = GetArrayValueSafe(_currentConfig.spawnCooldownPerLvl, idx, 2f);
+        _allCount = Mathf.Max(0, _currentConfig.defaultMaxAlive);
+        _spawnCooldown = Mathf.Max(0f, _currentConfig.defaultSpawnCooldown);
         _stageEnemies = _currentConfig.enemies;
     }
 
@@ -423,22 +420,6 @@ public class EnemySpawner : MonoBehaviour
             StopCoroutine(_transitionCoroutine);
             _transitionCoroutine = null;
         }
-    }
-
-    private static int GetArrayValueSafe(int[] arr, int index, int fallback)
-    {
-        if (arr == null || arr.Length == 0) return fallback;
-        if (index < 0) index = 0;
-        if (index >= arr.Length) index = arr.Length - 1;
-        return arr[index];
-    }
-
-    private static float GetArrayValueSafe(float[] arr, int index, float fallback)
-    {
-        if (arr == null || arr.Length == 0) return fallback;
-        if (index < 0) index = 0;
-        if (index >= arr.Length) index = arr.Length - 1;
-        return arr[index];
     }
 
     private static EnemyEntry PickEnemyEntryByWeight(List<EnemyEntry> entries)
