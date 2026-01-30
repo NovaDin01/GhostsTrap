@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Systems")]
     [SerializeField] private EnemySpawner enemySpawner;
+    [SerializeField] private GameRunManager gameRunManager;
     [SerializeField] private List<MonoBehaviour> systemsToEnable = new();
 
     private bool _hasStarted;
@@ -22,12 +23,33 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        EnsureGameRunManager();
         for (int i = 0; i < systemsToEnable.Count; i++)
         {
             if (systemsToEnable[i] != null)
             {
                 systemsToEnable[i].enabled = false;
             }
+        }
+    }
+
+    private void EnsureGameRunManager()
+    {
+        if (gameRunManager == null)
+        {
+            gameRunManager = FindObjectOfType<GameRunManager>();
+        }
+
+        if (gameRunManager == null)
+        {
+            var managerObject = new GameObject(nameof(GameRunManager));
+            gameRunManager = managerObject.AddComponent<GameRunManager>();
+            DontDestroyOnLoad(managerObject);
+        }
+
+        if (!systemsToEnable.Contains(gameRunManager))
+        {
+            systemsToEnable.Add(gameRunManager);
         }
     }
 

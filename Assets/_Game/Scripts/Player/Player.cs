@@ -203,7 +203,17 @@ public class Player : MonoBehaviour, ITakingDamage
 
     public void ApplyDamage(int amount)
     {
-        if (_isDead) return;
+        if (_isDead)
+        {
+            return;
+        }
+
+        if (currentHp <= 0)
+        {
+            Die();
+            return;
+        }
+
         if (damageInvulnerabilityTimer > 0f) return;
         if (amount <= 0) return;
 
@@ -217,12 +227,18 @@ public class Player : MonoBehaviour, ITakingDamage
 
         if (currentHp <= 0)
         {
-            _isDead = true;
-            OnDied?.Invoke();
+            Die();
             return;
         }
 
         animator.SetTrigger("Damage");
+    }
+
+    private void Die()
+    {
+        if (_isDead) return;
+        _isDead = true;
+        OnDied?.Invoke();
     }
 
 
