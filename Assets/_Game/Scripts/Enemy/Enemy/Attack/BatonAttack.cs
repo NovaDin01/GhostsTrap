@@ -31,7 +31,11 @@ public class BatonAttack : IEnemyAttacker
         // атакуем только если близко И кулдаун прошёл
         if (distSqr <= _rangeFireSqr && _attackTimer <= 0f)
         {
+            
+            _enemy.RaiseAttack();
+            VisualEffects.Instance.PlayEnemyMeleeAttackSfx(_enemy.transform.position);
             _player.ApplyDamage(_setting.Damage);
+
             _attackTimer = _setting.SpeedFire;
         }
     }

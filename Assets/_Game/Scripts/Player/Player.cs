@@ -13,7 +13,10 @@ public class Player : MonoBehaviour, ITakingDamage
     [SerializeField] private float startTime2Attack = 0.8f;
     [SerializeField] private int startMaxHp = 10;
     [SerializeField] private float damageInvulnerabilityDuration = 0.4f;
-
+    
+    [Header("SFX")]
+    [SerializeField] private AudioClip catchClip;
+    [SerializeField] private AudioClip throwClip;
     
     [Header("Animation")]
     [SerializeField] private Animator animator;
@@ -102,12 +105,33 @@ public class Player : MonoBehaviour, ITakingDamage
     {
         GridNet grid = Instantiate(gridPrefab);
         _currentGridCount++;
-        
+    
         grid.OnLoot += HandleLoot;
-        grid.onBack += GridBack;
+        grid.OnBack += GridBack;
+
+        grid.OnCaught += HandleCaught;
 
         grid.Init(_gridSpeed, _gridRadius, lootsMask, _trapPosition, _targetPosition);
+
+        animator.SetTrigger("Throw");
+        VisualEffects.Instance.PlayThrowSfx(transform.position);
     }
+    
+    private void HandleCaught(GameObject caughtObj)
+    {
+        if (caughtObj == null) return;
+
+        VisualEffects.Instance.PlayCatchSfx(caughtObj.transform.position);
+        animator.SetTrigger("Catch");
+
+
+        // Или напрямую Animator врага:
+        var enemyAnim = caughtObj.GetComponentInChildren<Animator>();
+        if (enemyAnim != null)
+            enemyAnim.SetTrigger("Caught"); // trigger Caught у врага
+    }
+
+
     
     private void HandleLoot(GameObject loot)
     {
@@ -138,7 +162,7 @@ public class Player : MonoBehaviour, ITakingDamage
             else
             {
                 animator.SetTrigger("GetLoot");
-                Destroy(loot); // çàïàñíîé âàðèàíò, åñëè ýòî íå Enemy
+                Destroy(loot); 
             }
 
           
@@ -153,11 +177,14 @@ public class Player : MonoBehaviour, ITakingDamage
         if (gridObj.TryGetComponent<GridNet>(out var grid))
         {
             grid.OnLoot -= HandleLoot;
-            grid.onBack -= GridBack;
+            grid.OnBack -= GridBack;
+
+            grid.OnCaught -= HandleCaught;
         }
 
         Destroy(gridObj);
     }
+
 
     public void ActivateAbilities(float time)
     {

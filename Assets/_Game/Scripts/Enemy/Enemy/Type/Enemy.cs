@@ -2,6 +2,8 @@
 using _Game.Scripts.Data;
 using UnityEngine;
 
+
+
 public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 {
     [SerializeField] protected EnemyData enemyData;
@@ -15,12 +17,19 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     protected bool _isCaught;
 
     private bool despawnNotified;
+    
+    public event Action OnAttack;
+    public void RaiseAttack() => OnAttack?.Invoke();
+
 
     public TypeAward AwardType => TypeAward.Money;
     public int AwardValue => enemyData.Award;
 
     public event Action<Enemy> OnCollectedEnemy; // для наград/эффектов
     public event Action<Enemy> OnDespawned;      // для спавнера (лимит живых)
+    public event Action OnArmorBroken;
+    public event Action OnCaught;
+
 
     public virtual void Awake()
     {
@@ -77,16 +86,19 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         if (_hasArmor)
         {
             BreakArmor();
+            OnArmorBroken?.Invoke();
             if (!Player.Instance.IsAbilityActive) 
                 return CatchResult.Resisted;
             
             AttachToCatcher(catcher);
             _isCaught = true;
+            OnCaught?.Invoke();
             return CatchResult.Caught;
         }
 
         AttachToCatcher(catcher);
         _isCaught = true;
+        OnCaught?.Invoke();
         return CatchResult.Caught;
     }
 
@@ -104,6 +116,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     public void ApplyDamage(int amount)
     {
         _hp -= amount;
+        
     }
 
     private void OnTriggerEnter2D(Collider2D other)

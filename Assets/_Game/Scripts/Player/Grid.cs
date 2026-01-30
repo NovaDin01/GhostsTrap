@@ -27,7 +27,13 @@ public class GridNet : MonoBehaviour
     private readonly List<Collider2D> _caught = new();
 
     public event Action<GameObject> OnLoot;
-    public event Action<GameObject> onBack;
+    public event Action<GameObject> OnBack;
+    public event Action<GameObject> OnCaught;
+    
+    public event Action OnAnyCaught;
+    private bool _anyCaughtFired;
+
+
 
     private void Awake()
     {
@@ -63,6 +69,8 @@ public class GridNet : MonoBehaviour
     {
         transform.position = _trap;
         _state = GridState.Throwing;
+        _anyCaughtFired = false;
+
 
         // включаем леску при вылете
         if (rope != null) rope.enabled = true;
@@ -131,10 +139,19 @@ public class GridNet : MonoBehaviour
                 continue;
 
             _caught.Add(enemy);
+            OnCaught?.Invoke(enemy.gameObject);
+
+            if (!_anyCaughtFired)
+            {
+                _anyCaughtFired = true;
+                OnAnyCaught?.Invoke();
+            }
+
         }
 
         _state = GridState.Returning;
     }
+
 
     private void GetLoot()
     {
@@ -146,7 +163,7 @@ public class GridNet : MonoBehaviour
             OnLoot?.Invoke(enemy.gameObject);
         }
 
-        onBack?.Invoke(gameObject);
+        OnBack?.Invoke(gameObject);
 
         _enemies = Array.Empty<Collider2D>();
         _caught.Clear();
