@@ -20,6 +20,9 @@ public class LongRangeMoveSO : MovementSettingsSO
     [SerializeField, Tooltip("Дистанция, на которую подходит враг к игроку")]
     private float distance;
     
+    public bool FacingRightByDefault = true;
+
+    
     public float Speed => speed;
     public float AngularSpeed => angularSpeed;
     public float MultSpeed => multSpeed;

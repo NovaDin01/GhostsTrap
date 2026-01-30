@@ -32,9 +32,15 @@ public class MeleeMove : IEnemyMovement
 
         Vector3 delta = targetPos - enemyPos; // направление к игроку
 
-        // flip по X (минимально)
-        if (_sprite != null && Mathf.Abs(delta.x) > 0.01f)
-            _sprite.flipX = delta.x > 0;
+        bool movingRight = delta.x > 0f;
+
+        if (_sprite != null)
+        {
+            _sprite.flipX = _setting.FacingRightByDefault
+                ? !movingRight
+                : movingRight;
+        }
+
 
         _enemy.transform.position = Vector3.MoveTowards(enemyPos, targetPos, step);
     }

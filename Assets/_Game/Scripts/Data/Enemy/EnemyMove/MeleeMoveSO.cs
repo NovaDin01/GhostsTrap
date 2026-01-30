@@ -18,6 +18,8 @@ namespace _Game.Scripts.Data
 
         [SerializeField, Tooltip("Дистанция, на которую подходит враг к игроку")]
         private float distance;
+        
+        public bool FacingRightByDefault = true;
     
         public float Speed => speed;
         public float MultSpeed => multSpeed;
