@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edd91635e4034b27830009c5a47eae55, type: 3}
   m_Name: TentaclesSpeedData
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeData
-  cost: 0
-  costIncrease: 0
+  cost: 5
+  costIncrease: 5
   lvl: 0
-  maxLvl: 0
+  maxLvl: 5

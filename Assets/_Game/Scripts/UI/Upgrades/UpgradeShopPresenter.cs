@@ -102,26 +102,41 @@ public class UpgradeShopPresenter : MonoBehaviour
     private void NotifyChanged()
     {
         var items = new List<UpgradeShopItemData>(_definitions.Count);
+
         foreach (var definition in _definitions)
         {
             if (definition == null || definition.Upgrade == null)
-            {
                 continue;
-            }
 
-            var upgrade = definition.Upgrade;
-            items.Add(new UpgradeShopItemData(
+            var up = definition.Upgrade;
+
+            var data = new UpgradeShopItemData(
                 definition.Id,
                 definition.DisplayName,
                 definition.Description,
                 definition.Icon,
-                upgrade.Cost,
-                upgrade.CostIncrease,
-                upgrade.Lvl,
-                upgrade.MaxLvl,
-                upgrade.CanBuy()));
+                up.Cost,
+                up.CostIncrease,
+                up.Lvl,
+                up.MaxLvl,
+                up.CanBuy());
+
+            items.Add(data);
         }
+
+        // --- —ќ–“»–ќ¬ ј ---
+        items.Sort((a, b) =>
+        {
+            // если Id Ч число в строке ("0", "1", "2")
+            if (int.TryParse(a.Id, out int ai) && int.TryParse(b.Id, out int bi))
+                return ai.CompareTo(bi);
+
+            // если Id не число Ч сортируем строкой
+            return string.CompareOrdinal(a.Id, b.Id);
+        });
+
 
         Changed?.Invoke(items);
     }
+
 }
