@@ -10,6 +10,8 @@ public abstract class Upgrade : MonoBehaviour
     private int _lvl;
     private int _maxLvl;
 
+    public event Action<Upgrade> Changed;
+
     public int Cost => _cost;
     public int CostIncrease => _costIncrease;
     public int Lvl => _lvl;
@@ -36,6 +38,12 @@ public abstract class Upgrade : MonoBehaviour
     {
         _cost += _costIncrease;
         _lvl += 1;
+        Changed?.Invoke(this);
+    }
+
+    public void NotifyChanged()
+    {
+        Changed?.Invoke(this);
     }
 
     public bool CanBuy()
