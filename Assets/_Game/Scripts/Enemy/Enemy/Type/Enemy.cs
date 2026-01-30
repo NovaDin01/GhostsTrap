@@ -15,6 +15,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     private int _hp;
     private bool _hasArmor;
     protected bool _isCaught;
+    private bool _isDead;
 
     private bool despawnNotified;
     
@@ -29,6 +30,8 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     public event Action<Enemy> OnDespawned;      // для спавнера (лимит живых)
     public event Action OnArmorBroken;
     public event Action OnCaught;
+    public event Action<int> OnDamaged;
+    public event Action OnDeath;
 
 
     public virtual void Awake()
@@ -41,6 +44,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     {
         _isCaught = false;
         despawnNotified = false;
+        _isDead = false;
 
         _hasArmor = enemyData.HasArmor;
         _hp = enemyData.Hp;
@@ -115,7 +119,15 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 
     public void ApplyDamage(int amount)
     {
+        if (_isDead) return;
+
         _hp -= amount;
+        OnDamaged?.Invoke(amount);
+        if (_hp <= 0 && !_isDead)
+        {
+            _isDead = true;
+            OnDeath?.Invoke();
+        }
         
     }
 

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6722398179404842650}
   - component: {fileID: 2336108599352573318}
   - component: {fileID: 7404267149978439372}
+  - component: {fileID: 8092619692244171532}
   m_Layer: 3
   m_Name: BaseBatonSolider
   m_TagString: Untagged
@@ -182,3 +183,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &8092619692244171532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537397527552562641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f252a9b923ec4ea99b65cf626b8cfb61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 0}
+  animator: {fileID: 0}
+  audioSource: {fileID: 0}
+  vfxRoot: {fileID: 0}

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3249809664106641540}
   - component: {fileID: 2065199634225668278}
   - component: {fileID: 7679994437399497855}
+  - component: {fileID: 3212031669164472577}
   m_Layer: 3
   m_Name: Scientist
   m_TagString: Untagged
@@ -198,6 +199,22 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+--- !u!114 &3212031669164472577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8112493171770542096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f252a9b923ec4ea99b65cf626b8cfb61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 0}
+  animator: {fileID: 7679994437399497855}
+  audioSource: {fileID: 0}
+  vfxRoot: {fileID: 0}
   m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1

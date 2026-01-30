@@ -65,6 +65,7 @@ public class LongRangeAttack : IEnemyAttacker
     {
         var bullet = UnityEngine.Object.Instantiate(_setting.Bullet);
         bullet.Init(_player, _enemy, _setting);
+        _enemy.RaiseAttack();
     }
 
     
