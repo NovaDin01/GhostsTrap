@@ -56,6 +56,7 @@ public class Player : MonoBehaviour, ITakingDamage
 
     public event Action OnApplyDamage;
     public event Action OnApplyHeal;
+    public event Action OnDied;
     
     private void Awake()
     {
@@ -210,7 +211,7 @@ public class Player : MonoBehaviour, ITakingDamage
 
         if (currentHp <= 0)
         {
-            SceneController.Instance.LoadMenu();
+            OnDied?.Invoke();
             return;
         }
 
