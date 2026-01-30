@@ -14,6 +14,8 @@ public class GameRunManager : MonoBehaviour
 
     private readonly GameStats _stats = new();
     private bool _runEnded;
+    private bool _playerSubscribed;
+    private bool _spawnerSubscribed;
 
     private void Awake()
     {
@@ -36,7 +38,7 @@ public class GameRunManager : MonoBehaviour
     private void OnEnable()
     {
         ResolveDependencies();
-        Subscribe();
+        TrySubscribe();
     }
 
     private void OnDisable()
@@ -57,33 +59,46 @@ public class GameRunManager : MonoBehaviour
         }
     }
 
-    private void Subscribe()
+    private void Update()
     {
-        if (player != null)
+        if (!_playerSubscribed || !_spawnerSubscribed)
+        {
+            ResolveDependencies();
+            TrySubscribe();
+        }
+    }
+
+    private void TrySubscribe()
+    {
+        if (player != null && !_playerSubscribed)
         {
             player.OnDied += HandlePlayerDied;
+            _playerSubscribed = true;
         }
 
-        if (enemySpawner != null)
+        if (enemySpawner != null && !_spawnerSubscribed)
         {
             enemySpawner.OnEnemySpawned += HandleEnemySpawned;
             enemySpawner.OnLocationsCompleted += HandleLocationCompleted;
             enemySpawner.OnRunCompleted += HandleRunCompleted;
+            _spawnerSubscribed = true;
         }
     }
 
     private void Unsubscribe()
     {
-        if (player != null)
+        if (player != null && _playerSubscribed)
         {
             player.OnDied -= HandlePlayerDied;
+            _playerSubscribed = false;
         }
 
-        if (enemySpawner != null)
+        if (enemySpawner != null && _spawnerSubscribed)
         {
             enemySpawner.OnEnemySpawned -= HandleEnemySpawned;
             enemySpawner.OnLocationsCompleted -= HandleLocationCompleted;
             enemySpawner.OnRunCompleted -= HandleRunCompleted;
+            _spawnerSubscribed = false;
         }
     }
 
