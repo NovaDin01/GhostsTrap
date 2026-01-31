@@ -1,5 +1,4 @@
 using UnityEngine;
-        Cursor.SetCursor(_defaultCursor, new Vector2(_defaultCursor.width / 2, _defaultCursor.height / 2), CursorMode.Auto);
 public class CursorController : MonoBehaviour
 {
     [SerializeField] private Texture2D _trapCursor; //ęóđńîđ ęîăäŕ íóćíî áđîńčňü ëîâóřęó
@@ -7,6 +6,7 @@ public class CursorController : MonoBehaviour
     private void Start()
     {
         SetTrapCursor();
+        Cursor.SetCursor(_defaultCursor, new Vector2(_defaultCursor.width / 2, _defaultCursor.height / 2), CursorMode.Auto);
     }
 
     public void SetTrapCursor()
