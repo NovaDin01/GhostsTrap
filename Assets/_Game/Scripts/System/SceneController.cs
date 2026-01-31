@@ -34,6 +34,11 @@ public class SceneController : MonoBehaviour
     {
         SceneManager.LoadScene(MENU_SCENE);
     }
+    
+    public bool GetScene()
+    {
+        return (SceneManager.GetActiveScene().name == MENU_SCENE);
+    }
 
     public void OpenAbout()
     {

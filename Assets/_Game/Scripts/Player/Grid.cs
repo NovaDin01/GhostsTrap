@@ -13,16 +13,13 @@ public class GridNet : MonoBehaviour
 {
     [Header("Rope (Line)")]
     [SerializeField] private LineRenderer rope;
+
     [Header("Target Marker")]
     [SerializeField] private GameObject targetMarkerPrefab;
 
+    [SerializeField] private Vector3 ropeStartOffset; // если нужно сместить начало (из "руки")
 
     private GameObject _targetMarkerInstance;
-
-        SpawnTargetMarker();
-        
-            ClearTargetMarker();
-    [SerializeField] private Vector3 ropeStartOffset; // åñëè íóæíî ñìåñòèòü íà÷àëî (èç "ðóêè")
 
     private float _speed;
     private float _radius;
@@ -38,23 +35,25 @@ public class GridNet : MonoBehaviour
     public event Action<GameObject> OnLoot;
     public event Action<GameObject> OnBack;
     public event Action<GameObject> OnCaught;
-    
+
     public event Action OnAnyCaught;
     private bool _anyCaughtFired;
 
-
-
     private void Awake()
     {
-        // åñëè íå íàçíà÷èë â èíñïåêòîðå — ïîïðîáóåì âçÿòü ñ îáúåêòà
         if (rope == null) rope = GetComponent<LineRenderer>();
 
         if (rope != null)
         {
             rope.positionCount = 2;
             rope.useWorldSpace = true;
-            rope.enabled = false; // âêëþ÷àåì òîëüêî êîãäà ëåòèì/âîçâðàùàåìñÿ
+            rope.enabled = false;
         }
+    }
+
+    private void OnDisable()
+    {
+        ClearTargetMarker();
     }
 
     private void Update()
@@ -80,8 +79,9 @@ public class GridNet : MonoBehaviour
         _state = GridState.Throwing;
         _anyCaughtFired = false;
 
+        // маркер цели — логично спавнить тут, когда уже есть _target
+        SpawnTargetMarker();
 
-        // âêëþ÷àåì ëåñêó ïðè âûëåòå
         if (rope != null) rope.enabled = true;
         UpdateRope(true);
     }
@@ -106,23 +106,30 @@ public class GridNet : MonoBehaviour
     private void MoveToTarget()
     {
         GridMove(_target);
+
         if (ClosingOnTarget(_target))
         {
             _state = GridState.Stopping;
             GetCaught();
+
+            // если маркер нужен только на месте цели — удаляем сразу после "попадания"
+            ClearTargetMarker();
         }
     }
 
     private void MoveToTrap()
     {
         GridMove(_trap);
+
         if (ClosingOnTarget(_trap))
         {
             _state = GridState.Stopping;
             GetLoot();
 
-            // êîãäà âåðíóëèñü — âûêëþ÷àåì ëåñêó
             if (rope != null) rope.enabled = false;
+
+            // если хочешь маркер держать до возвращения — перенеси ClearTargetMarker() сюда
+            // ClearTargetMarker();
         }
     }
 
@@ -139,9 +146,7 @@ public class GridNet : MonoBehaviour
                 continue;
 
             if (enemy.TryGetComponent<ITakingDamage>(out var takingDamage))
-            {
                 takingDamage.ApplyDamage(1);
-            }
 
             var result = obj.TryCatch(transform);
             if (result != CatchResult.Caught)
@@ -155,12 +160,10 @@ public class GridNet : MonoBehaviour
                 _anyCaughtFired = true;
                 OnAnyCaught?.Invoke();
             }
-
         }
 
         _state = GridState.Returning;
     }
-
 
     private void GetLoot()
     {
@@ -203,7 +206,9 @@ public class GridNet : MonoBehaviour
     private void SpawnTargetMarker()
     {
         if (targetMarkerPrefab == null) return;
-        if (_targetMarkerInstance != null) return;
+
+        // если был старый — заменить (на случай повторного выстрела)
+        ClearTargetMarker();
 
         _targetMarkerInstance = Instantiate(targetMarkerPrefab, _target, Quaternion.identity);
     }

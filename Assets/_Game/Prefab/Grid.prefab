@@ -106,6 +106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Grid
   rope: {fileID: 4797461634394627831}
+  targetMarkerPrefab: {fileID: 5148685401449794027, guid: 0d71df89e43359344944f8a82d00472a, type: 3}
   ropeStartOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &6334857151688203958
 GameObject:

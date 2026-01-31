@@ -6,6 +6,7 @@ public class YandexAdsBridge : MonoBehaviour
     public static YandexAdsBridge Instance;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    
     private static void EnsureInstance()
     {
         if (Instance != null) return;
@@ -32,6 +33,7 @@ public class YandexAdsBridge : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
     }
 
     public void ShowStartupAd()
