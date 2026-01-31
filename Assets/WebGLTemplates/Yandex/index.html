@@ -36,22 +36,23 @@
   <script>
     window.yaContextCb = window.yaContextCb || [];
 
-    window.ShowYandexFullscreenAd = function (placement) {
+    window.Yandex_ShowFullscreenAd = function (placement) {
       window.yaContextCb.push(() => {
-        if (!window.Ya || !Ya.Context || !Ya.Context.AdvManager || !Ya.Context.AdvManager.showFullscreenAdv) {
-          console.warn("Yandex Ads: fullscreen not available");
-          return;
-        }
+      if (!window.Ya || !Ya.Context || !Ya.Context.AdvManager || !Ya.Context.AdvManager.showFullscreenAdv) {
+        console.warn("Yandex Ads: fullscreen not available");
+        return;
+      }
 
-        Ya.Context.AdvManager.showFullscreenAdv({
-          blockId: "YANDEX_ADS_FULLSCREEN_BLOCK_ID",
-          callbacks: {
-            onClose: () => console.log("Yandex Ads closed", placement),
-            onError: (e) => console.warn("Yandex Ads error", placement, e)
-          }
-        });
+      Ya.Context.AdvManager.showFullscreenAdv({
+        blockId: "YANDEX_ADS_FULLSCREEN_BLOCK_ID",
+        callbacks: {
+          onClose: () => console.log("Yandex Ads closed", placement),
+          onError: (e) => console.warn("Yandex Ads error", placement, e)
+        }
       });
-    };
+    });
+  };
+
   </script>
 </head>
 <body>
