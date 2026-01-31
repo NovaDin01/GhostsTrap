@@ -18,7 +18,7 @@ public class EnemyPresentationEventConfig
 {
     public EnemyPresentationEvent EventType;
     public string AnimatorTrigger;
-    public AudioClip SfxClip;
+    public AudioClip[] SfxClip;
     [Range(0f, 1f)] public float SfxVolume = 1f;
     public GameObject VfxPrefab;
     public ParticleSystem ParticlePrefab;

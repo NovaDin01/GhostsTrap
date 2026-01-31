@@ -14,9 +14,7 @@ public class Player : MonoBehaviour, ITakingDamage
     [SerializeField] private int startMaxHp = 10;
     [SerializeField] private float damageInvulnerabilityDuration = 0.4f;
     
-    [Header("SFX")]
-    [SerializeField] private AudioClip catchClip;
-    [SerializeField] private AudioClip throwClip;
+ 
     
     [Header("Animation")]
     [SerializeField] private Animator animator;
@@ -124,9 +122,6 @@ public class Player : MonoBehaviour, ITakingDamage
     {
         if (caughtObj == null) return;
 
-        VisualEffects.Instance.PlayCatchSfx(caughtObj.transform.position);
-        animator.SetTrigger("Catch");
-
 
         // Или напрямую Animator врага:
         var enemyAnim = caughtObj.GetComponentInChildren<Animator>();
@@ -139,6 +134,9 @@ public class Player : MonoBehaviour, ITakingDamage
     private void HandleLoot(GameObject loot)
     {
         if (loot == null) return;
+        
+        VisualEffects.Instance.PlayCatchSfx(transform.position);
+        animator.SetTrigger("Catch");
 
         if (loot.TryGetComponent<IObjectAttracted>(out var a))
         {

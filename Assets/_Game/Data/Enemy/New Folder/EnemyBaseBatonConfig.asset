@@ -15,24 +15,11 @@ MonoBehaviour:
   entries:
   - EventType: 1
     AnimatorTrigger: Attack
-    SfxClip: {fileID: 8300000, guid: 60a7cc8327dce3c499079c1ab4baab8e, type: 3}
+    SfxClip:
+    - {fileID: 8300000, guid: 0505be351d045fa4ba0e1bfd5a9b5877, type: 3}
+    - {fileID: 8300000, guid: ba3bd04194b0d784abd46086eef943d0, type: 3}
+    - {fileID: 8300000, guid: edbefab4c89f1504abee32437cf2c97e, type: 3}
     SfxVolume: 0.603
-    VfxPrefab: {fileID: 0}
-    ParticlePrefab: {fileID: 0}
-    UseWorldPosition: 0
-    PositionOffset: {x: 0, y: 0, z: 0}
-  - EventType: 3
-    AnimatorTrigger: 
-    SfxClip: {fileID: 0}
-    SfxVolume: 0
-    VfxPrefab: {fileID: 0}
-    ParticlePrefab: {fileID: 0}
-    UseWorldPosition: 0
-    PositionOffset: {x: 0, y: 0, z: 0}
-  - EventType: 6
-    AnimatorTrigger: 
-    SfxClip: {fileID: 0}
-    SfxVolume: 0
     VfxPrefab: {fileID: 0}
     ParticlePrefab: {fileID: 0}
     UseWorldPosition: 0

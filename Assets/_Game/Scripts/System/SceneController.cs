@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class SceneController : MonoBehaviour
 {
     public static SceneController Instance;
+    public GameObject about;
     
     private const string MENU_SCENE = "Menu";
     private const string GAME_SCENE = "Game";
@@ -32,6 +33,11 @@ public class SceneController : MonoBehaviour
     public void LoadMenu()
     {
         SceneManager.LoadScene(MENU_SCENE);
+    }
+
+    public void OpenAbout()
+    {
+        about.SetActive(about.activeSelf ? false : true);
     }
 
 }

@@ -100,11 +100,11 @@ public class EnemyPresentation : MonoBehaviour
         }
     }
 
-    private void PlaySfx(AudioClip clip, float volume)
+    private void PlaySfx(AudioClip[] clip, float volume)
     {
         if (audioSource != null)
         {
-            audioSource.PlayOneShot(clip, volume);
+            audioSource.PlayOneShot(clip[Random.Range(0, clip.Length)], volume);
             return;
         }
 
@@ -114,8 +114,8 @@ public class EnemyPresentation : MonoBehaviour
         var src = go.AddComponent<AudioSource>();
         src.spatialBlend = 0f;
         src.volume = volume;
-        src.PlayOneShot(clip);
-        Destroy(go, clip.length + 0.05f);
+        src.PlayOneShot(clip[Random.Range(0, clip.Length)], volume);
+        Destroy(go, clip.Length + 0.05f);
     }
 
     private void SpawnPrefab(GameObject prefab, EnemyPresentationEventConfig entry)

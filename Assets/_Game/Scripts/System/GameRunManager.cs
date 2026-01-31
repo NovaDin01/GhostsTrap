@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GameRunManager : MonoBehaviour
@@ -11,6 +12,10 @@ public class GameRunManager : MonoBehaviour
     [Header("Optional title text")]
     [SerializeField] private string defeatTitle = "Поражение";
     [SerializeField] private string winTitle = "Забег завершен";
+
+    [SerializeField] private AudioClip mainMusic;
+    [SerializeField] private AudioClip endMusic;
+    [SerializeField] private AudioSource audioSource;
 
     private readonly GameStats _stats = new();
     private bool _runEnded;
@@ -181,6 +186,8 @@ public class GameRunManager : MonoBehaviour
         Time.timeScale = 0f;
         if (defeatWindow != null)
         {
+            audioSource.Stop();
+            audioSource.PlayOneShot(endMusic);
             defeatWindow.Show(title, _stats);
         }
     }
