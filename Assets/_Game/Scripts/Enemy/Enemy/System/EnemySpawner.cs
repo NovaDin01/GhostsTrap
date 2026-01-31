@@ -86,6 +86,10 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private Animator _playerAnimator;
     [SerializeField] private string _playerEnterTrigger = "Enter";
 
+    [Header("Transition fade")]
+    [SerializeField] private CanvasGroup _fadeCanvasGroup;
+    [SerializeField] private float _fadeDuration = 0.5f;
+
 
     // events
     public event Action<int> OnTimerLevelChanged;           // когда lvl повысился
@@ -116,6 +120,8 @@ public class EnemySpawner : MonoBehaviour
     private int _locationsCompleted;
     private bool _runCompleted;
     private Coroutine _transitionCoroutine;
+
+    private readonly HashSet<Enemy> _aliveEnemies = new();
 
     private bool _spawningEnabled = true;
     private bool _hasStarted;
@@ -226,6 +232,14 @@ public class EnemySpawner : MonoBehaviour
             _player.transform.position = _currentConfig.playerSpawnPoint.position;
         }
 
+        Enemy.SetFrozen(false);
+
+        if (_fadeCanvasGroup != null)
+        {
+            _fadeCanvasGroup.alpha = 0f;
+            _fadeCanvasGroup.blocksRaycasts = false;
+        }
+
         // reset round
         _spawningEnabled = true;
         _remainingTime = _roundDuration;
@@ -251,6 +265,7 @@ public class EnemySpawner : MonoBehaviour
     private void FinishLocation()
     {
         _spawningEnabled = false;
+        Enemy.SetFrozen(true);
         OnLocationFinished?.Invoke(_currentLocation);
 
         _locationsCompleted++;
@@ -271,7 +286,15 @@ public class EnemySpawner : MonoBehaviour
     private System.Collections.IEnumerator TransitionToNextLocation()
     {
         yield return PlayTransitionAnimation();
+        yield return Fade(1f);
+        ClearAliveEnemies();
         GoNextLocation();
+        yield return Fade(0f);
+        Enemy.SetFrozen(false);
+        if (_player != null)
+        {
+            _player.enabled = true;
+        }
     }
 
     private System.Collections.IEnumerator PlayTransitionAnimation()
@@ -286,7 +309,6 @@ public class EnemySpawner : MonoBehaviour
             yield break;
         }
 
-        bool wasEnabled = _player.enabled;
         _player.enabled = false;
 
         if (_doorAnimator != null && !string.IsNullOrWhiteSpace(_doorOpenTrigger))
@@ -306,7 +328,6 @@ public class EnemySpawner : MonoBehaviour
                 yield return new WaitForSeconds(_transitionDuration);
             }
 
-            _player.enabled = wasEnabled;
             yield break;
         }
 
@@ -322,9 +343,53 @@ public class EnemySpawner : MonoBehaviour
         }
 
         _player.transform.position = _transitionTarget.position;
-        _player.enabled = wasEnabled;
     }
 
+
+    private void ClearAliveEnemies()
+    {
+        if (_aliveEnemies.Count == 0) return;
+
+        var enemies = new List<Enemy>(_aliveEnemies);
+        _aliveEnemies.Clear();
+
+        foreach (var enemy in enemies)
+        {
+            if (enemy == null) continue;
+            Destroy(enemy.gameObject);
+        }
+
+        _currentCount = 0;
+    }
+
+    private System.Collections.IEnumerator Fade(float targetAlpha)
+    {
+        if (_fadeCanvasGroup == null)
+        {
+            if (_fadeDuration > 0f)
+            {
+                yield return new WaitForSeconds(_fadeDuration);
+            }
+
+            yield break;
+        }
+
+        _fadeCanvasGroup.blocksRaycasts = targetAlpha > 0f;
+        float startAlpha = _fadeCanvasGroup.alpha;
+        float elapsed = 0f;
+        float duration = Mathf.Max(0.01f, _fadeDuration);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            _fadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+            yield return null;
+        }
+
+        _fadeCanvasGroup.alpha = targetAlpha;
+        _fadeCanvasGroup.blocksRaycasts = targetAlpha > 0f;
+    }
 
     private void ApplyLevelSettings(int lvl)
     {
@@ -357,6 +422,7 @@ public class EnemySpawner : MonoBehaviour
         Enemy enemy = Instantiate(entry.prefab, sp.position, sp.rotation);
         enemy.Init(_player);
 
+        _aliveEnemies.Add(enemy);
         _currentCount++;
         enemy.OnDespawned += OnEnemyDespawned;
         OnEnemySpawned?.Invoke(enemy);
@@ -382,6 +448,7 @@ public class EnemySpawner : MonoBehaviour
     private void OnEnemyDespawned(Enemy enemy)
     {
         enemy.OnDespawned -= OnEnemyDespawned;
+        _aliveEnemies.Remove(enemy);
         _currentCount = Mathf.Max(0, _currentCount - 1);
     }
 

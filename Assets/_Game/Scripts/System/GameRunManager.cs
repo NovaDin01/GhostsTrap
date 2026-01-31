@@ -165,22 +165,27 @@ public class GameRunManager : MonoBehaviour
     {
         if (_runEnded) return;
         _runEnded = true;
-        EndRun(winTitle);
+        EndRun(winTitle, false);
     }
 
     private void HandlePlayerDied()
     {
         if (_runEnded) return;
         _runEnded = true;
-        EndRun(defeatTitle);
+        EndRun(defeatTitle, true);
     }
 
-    private void EndRun(string title)
+    private void EndRun(string title, bool showDefeatAd)
     {
         _stats.StopRun();
         if (enemySpawner != null)
         {
             enemySpawner.StopRun();
+        }
+
+        if (showDefeatAd && YandexAdsBridge.Instance != null)
+        {
+            YandexAdsBridge.Instance.ShowDefeatAd();
         }
 
         Time.timeScale = 0f;

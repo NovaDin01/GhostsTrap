@@ -33,6 +33,12 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     public event Action<int> OnDamaged;
     public event Action OnDeath;
 
+    public static bool IsFrozen { get; private set; }
+
+    public static void SetFrozen(bool frozen)
+    {
+        IsFrozen = frozen;
+    }
 
     public virtual void Awake()
     {
@@ -58,7 +64,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 
     public virtual void Update()
     {
-        if (_isCaught) return;
+        if (_isCaught || IsFrozen) return;
         _movement?.Tick();
     }
 

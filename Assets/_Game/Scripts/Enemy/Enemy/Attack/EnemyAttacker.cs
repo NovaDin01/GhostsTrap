@@ -30,7 +30,7 @@ public class EnemyAttacker : Enemy
 
     public override void Update()
     {
-        if (_isCaught) return;
+        if (_isCaught || IsFrozen) return;
         Tick();
     }
 
@@ -52,11 +52,11 @@ public class EnemyAttacker : Enemy
 
     public void Tick()
     {
-        // сначала выбрать состояние
+        // Г±Г­Г Г·Г Г«Г  ГўГ»ГЎГ°Г ГІГј Г±Г®Г±ГІГ®ГїГ­ГЁГҐ
         bool shouldAttack = _attacker != null && _attacker.IsNearTheObject();
         _state = shouldAttack ? ActionState.Attack : ActionState.Movement;
 
-        // потом выполнить логику состояния
+        // ГЇГ®ГІГ®Г¬ ГўГ»ГЇГ®Г«Г­ГЁГІГј Г«Г®ГЈГЁГЄГі Г±Г®Г±ГІГ®ГїГ­ГЁГї
         switch (_state)
         {
             case ActionState.Movement:

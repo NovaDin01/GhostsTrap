@@ -13,7 +13,16 @@ public class GridNet : MonoBehaviour
 {
     [Header("Rope (Line)")]
     [SerializeField] private LineRenderer rope;
-    [SerializeField] private Vector3 ropeStartOffset; // если нужно сместить начало (из "руки")
+    [Header("Target Marker")]
+    [SerializeField] private GameObject targetMarkerPrefab;
+
+
+    private GameObject _targetMarkerInstance;
+
+        SpawnTargetMarker();
+        
+            ClearTargetMarker();
+    [SerializeField] private Vector3 ropeStartOffset; // ГҐГ±Г«ГЁ Г­ГіГ¦Г­Г® Г±Г¬ГҐГ±ГІГЁГІГј Г­Г Г·Г Г«Г® (ГЁГ§ "Г°ГіГЄГЁ")
 
     private float _speed;
     private float _radius;
@@ -37,14 +46,14 @@ public class GridNet : MonoBehaviour
 
     private void Awake()
     {
-        // если не назначил в инспекторе — попробуем взять с объекта
+        // ГҐГ±Г«ГЁ Г­ГҐ Г­Г Г§Г­Г Г·ГЁГ« Гў ГЁГ­Г±ГЇГҐГЄГІГ®Г°ГҐ вЂ” ГЇГ®ГЇГ°Г®ГЎГіГҐГ¬ ГўГ§ГїГІГј Г± Г®ГЎГєГҐГЄГІГ 
         if (rope == null) rope = GetComponent<LineRenderer>();
 
         if (rope != null)
         {
             rope.positionCount = 2;
             rope.useWorldSpace = true;
-            rope.enabled = false; // включаем только когда летим/возвращаемся
+            rope.enabled = false; // ГўГЄГ«ГѕГ·Г ГҐГ¬ ГІГ®Г«ГјГЄГ® ГЄГ®ГЈГ¤Г  Г«ГҐГІГЁГ¬/ГўГ®Г§ГўГ°Г Г№Г ГҐГ¬Г±Гї
         }
     }
 
@@ -72,7 +81,7 @@ public class GridNet : MonoBehaviour
         _anyCaughtFired = false;
 
 
-        // включаем леску при вылете
+        // ГўГЄГ«ГѕГ·Г ГҐГ¬ Г«ГҐГ±ГЄГі ГЇГ°ГЁ ГўГ»Г«ГҐГІГҐ
         if (rope != null) rope.enabled = true;
         UpdateRope(true);
     }
@@ -112,7 +121,7 @@ public class GridNet : MonoBehaviour
             _state = GridState.Stopping;
             GetLoot();
 
-            // когда вернулись — выключаем леску
+            // ГЄГ®ГЈГ¤Г  ГўГҐГ°Г­ГіГ«ГЁГ±Гј вЂ” ГўГ»ГЄГ«ГѕГ·Г ГҐГ¬ Г«ГҐГ±ГЄГі
             if (rope != null) rope.enabled = false;
         }
     }
@@ -189,5 +198,25 @@ public class GridNet : MonoBehaviour
     private void GridMove(Vector2 target)
     {
         transform.position = Vector2.MoveTowards(transform.position, target, _speed * Time.deltaTime);
+    }
+
+    private void SpawnTargetMarker()
+    {
+        if (targetMarkerPrefab == null) return;
+        if (_targetMarkerInstance != null) return;
+
+        _targetMarkerInstance = Instantiate(targetMarkerPrefab, _target, Quaternion.identity);
+    }
+
+    private void ClearTargetMarker()
+    {
+        if (_targetMarkerInstance == null) return;
+        Destroy(_targetMarkerInstance);
+        _targetMarkerInstance = null;
+    }
+
+    private void OnDestroy()
+    {
+        ClearTargetMarker();
     }
 }

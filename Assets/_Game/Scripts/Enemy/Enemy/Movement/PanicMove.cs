@@ -14,6 +14,9 @@ public class PanicMove : IEnemyMovement
     
     private SpriteRenderer sprite;
 
+    private LayerMask _obstacleMask;
+    private float _obstacleRadius;
+
 
     private float _segmentDistance = 1;
 
@@ -28,6 +31,8 @@ public class PanicMove : IEnemyMovement
             throw new ArgumentException("PanicMove requires PanicMoveSO");
 
         _segmentDistance = _setting.MinDistance;
+        _obstacleMask = _setting.ObstacleMask;
+        _obstacleRadius = Mathf.Max(0.01f, _setting.ObstacleRadius);
         sprite = enemy.GetComponentInChildren<SpriteRenderer>(); 
 
         StartNewSegment();
@@ -38,8 +43,21 @@ public class PanicMove : IEnemyMovement
     public void Tick()
     {
         float step = _setting.Speed * Time.deltaTime;
-        _enemy.transform.position += (Vector3)(_dir * step);
-        
+        Vector2 currentPos = _enemy.transform.position;
+
+        if (_obstacleMask.value != 0)
+        {
+            RaycastHit2D hit = Physics2D.CircleCast(currentPos, _obstacleRadius, _dir, step, _obstacleMask);
+            if (hit.collider != null)
+            {
+                _enemy.transform.position = hit.centroid - _dir * _obstacleRadius;
+                StartNewSegment();
+                return;
+            }
+        }
+
+        _enemy.transform.position = currentPos + _dir * step;
+
         Vector3 diff = (Vector2)_enemy.transform.position - _startPos;
         float distSqr = diff.sqrMagnitude;
         float segmentDistSqr = _segmentDistance * _segmentDistance;

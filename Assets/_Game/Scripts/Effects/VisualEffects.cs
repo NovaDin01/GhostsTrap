@@ -13,6 +13,8 @@ public class VisualEffects : MonoBehaviour
     [SerializeField] private AudioClip catchClip;
     [SerializeField] private AudioClip throwClip;
     [SerializeField] private AudioClip enemyMeleeAttackClip;
+    [SerializeField] private AudioClip enemyShootClip;
+    [SerializeField] private AudioClip buttonClickClip;
 
     [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
 
@@ -20,6 +22,16 @@ public class VisualEffects : MonoBehaviour
     {
         if (Instance != null && Instance != this) Destroy(gameObject);
         else Instance = this;
+
+        if (enemyShootClip == null)
+        {
+            enemyShootClip = Resources.Load<AudioClip>("Enemy/shot_muffled");
+        }
+
+        if (buttonClickClip == null)
+        {
+            buttonClickClip = Resources.Load<AudioClip>("UI/button_click");
+        }
     }
 
     // ---------- VFX ----------
@@ -37,6 +49,10 @@ public class VisualEffects : MonoBehaviour
     public void PlayCatchSfx(Vector3 pos) => PlayOneShotAtPoint(catchClip, pos);
     public void PlayThrowSfx(Vector3 pos) => PlayOneShotAtPoint(throwClip, pos);
     public void PlayEnemyMeleeAttackSfx(Vector3 pos) => PlayOneShotAtPoint(enemyMeleeAttackClip, pos);
+    public void PlayEnemyShootSfx(Vector3 pos) => PlayOneShotAtPoint(enemyShootClip, pos);
+    public void PlayButtonClickSfx(Vector3 pos) => PlayOneShotAtPoint(buttonClickClip, pos);
+
+    public AudioClip ButtonClickClip => buttonClickClip;
 
     private void PlayOneShotAtPoint(AudioClip clip, Vector3 pos)
     {

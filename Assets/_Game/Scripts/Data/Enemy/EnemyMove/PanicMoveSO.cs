@@ -15,8 +15,17 @@ public class PanicMoveSO : MovementSettingsSO
 
     [SerializeField, Tooltip("Максимальная дистанция, которую враг проходит перед сменой направления")]
     private float maxDistance;
+
+    [Header("Столкновения")]
+    [SerializeField, Tooltip("Слои физических объектов для столкновений")]
+    private LayerMask obstacleMask;
+
+    [SerializeField, Tooltip("Радиус проверки препятствий")]
+    private float obstacleRadius = 0.2f;
     
     public float Speed => speed;
     public float MinDistance => minDistance;
     public float MaxDistance => maxDistance;
+    public LayerMask ObstacleMask => obstacleMask;
+    public float ObstacleRadius => obstacleRadius;
 }

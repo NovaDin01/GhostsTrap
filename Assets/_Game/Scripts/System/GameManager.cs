@@ -58,6 +58,11 @@ public class GameManager : MonoBehaviour
         if (_hasStarted) return;
         _hasStarted = true;
 
+        if (YandexAdsBridge.Instance != null)
+        {
+            YandexAdsBridge.Instance.ShowStartupAd();
+        }
+
         for (int i = 0; i < systemsToEnable.Count; i++)
         {
             if (systemsToEnable[i] != null)
