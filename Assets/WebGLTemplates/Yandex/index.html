@@ -15,12 +15,14 @@
       k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a);
     })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
-    // Замените YANDEX_METRICA_ID на ваш реальный ID счетчика.
-    ym("YANDEX_METRICA_ID", "init", {
-      clickmap: true,
-      trackLinks: true,
-      accurateTrackBounce: true
-    });
+    const yandexMetricaId = "YANDEX_METRICA_ID";
+    if (yandexMetricaId && yandexMetricaId !== "YANDEX_METRICA_ID") {
+      ym(yandexMetricaId, "init", {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true
+      });
+    }
   </script>
   <noscript>
     <div>
@@ -29,29 +31,72 @@
   </noscript>
   <!-- /Yandex.Metrica -->
 
+  <!-- Yandex Games SDK -->
+  <script src="https://yandex.ru/games/sdk/v2"></script>
+  <!-- /Yandex Games SDK -->
+
   <!-- Yandex Ads -->
   <script src="https://yandex.ru/ads/system/context.js" async></script>
   <!-- /Yandex Ads -->
 
   <script>
     window.yaContextCb = window.yaContextCb || [];
+    window.ysdk = null;
+
+    YaGames.init().then((sdk) => {
+      window.ysdk = sdk;
+    }).catch((e) => {
+      console.warn("Yandex Games SDK init failed", e);
+    });
+
+    function showYandexGamesFullscreen(placement) {
+      if (!window.ysdk || !window.ysdk.adv || !window.ysdk.adv.showFullscreenAdv) {
+        return false;
+      }
+
+      window.ysdk.adv.showFullscreenAdv({
+        callbacks: {
+          onClose: () => console.log("Yandex Games Ads closed", placement),
+          onError: (e) => console.warn("Yandex Games Ads error", placement, e)
+        }
+      });
+      return true;
+    }
+
+    function showYandexContextFullscreen(placement) {
+      const blockId = "YANDEX_ADS_FULLSCREEN_BLOCK_ID";
+      if (blockId === "YANDEX_ADS_FULLSCREEN_BLOCK_ID") {
+        return false;
+      }
+
+      window.yaContextCb.push(() => {
+        if (!window.Ya || !Ya.Context || !Ya.Context.AdvManager || !Ya.Context.AdvManager.showFullscreenAdv) {
+          console.warn("Yandex Ads: fullscreen not available");
+          return;
+        }
+
+        Ya.Context.AdvManager.showFullscreenAdv({
+          blockId,
+          callbacks: {
+            onClose: () => console.log("Yandex Ads closed", placement),
+            onError: (e) => console.warn("Yandex Ads error", placement, e)
+          }
+        });
+      });
+      return true;
+    }
 
     window.Yandex_ShowFullscreenAd = function (placement) {
-      window.yaContextCb.push(() => {
-      if (!window.Ya || !Ya.Context || !Ya.Context.AdvManager || !Ya.Context.AdvManager.showFullscreenAdv) {
-        console.warn("Yandex Ads: fullscreen not available");
+      if (showYandexGamesFullscreen(placement)) {
         return;
       }
 
-      Ya.Context.AdvManager.showFullscreenAdv({
-        blockId: "YANDEX_ADS_FULLSCREEN_BLOCK_ID",
-        callbacks: {
-          onClose: () => console.log("Yandex Ads closed", placement),
-          onError: (e) => console.warn("Yandex Ads error", placement, e)
-        }
-      });
-    });
-  };
+      if (showYandexContextFullscreen(placement)) {
+        return;
+      }
+
+      console.warn("Yandex Ads: fullscreen not configured", placement);
+    };
 
   </script>
 </head>
@@ -68,12 +113,15 @@
   <!-- Yandex Ads container -->
   <div id="yandex_rtb" class="yandex-ads"></div>
   <script>
-    window.yaContextCb.push(() => {
-      Ya.Context.AdvManager.render({
-        renderTo: "yandex_rtb",
-        blockId: "YANDEX_ADS_BLOCK_ID"
+    const yandexAdsBlockId = "YANDEX_ADS_BLOCK_ID";
+    if (yandexAdsBlockId && yandexAdsBlockId !== "YANDEX_ADS_BLOCK_ID") {
+      window.yaContextCb.push(() => {
+        Ya.Context.AdvManager.render({
+          renderTo: "yandex_rtb",
+          blockId: yandexAdsBlockId
+        });
       });
-    });
+    }
   </script>
   <!-- /Yandex Ads container -->
 

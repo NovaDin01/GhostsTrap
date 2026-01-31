@@ -1,9 +1,9 @@
 using UnityEngine;
-//Класс изменения внешнего вида курсора (когда ставить ловушку 1 спрайт, когда поставил 2)
+        Cursor.SetCursor(_defaultCursor, new Vector2(_defaultCursor.width / 2, _defaultCursor.height / 2), CursorMode.Auto);
 public class CursorController : MonoBehaviour
 {
-    [SerializeField] private Texture2D _trapCursor; //курсор когда нужно бросить ловушку
-    [SerializeField] private Texture2D _defaultCursor; //курсор когда ловушки расставлены
+    [SerializeField] private Texture2D _trapCursor; //Д™ГіД‘Е„Г®Д‘ Д™Г®ДѓГ¤Е• Г­ГіД‡Г­Г® ГЎД‘Г®Е„ДЌЕ€Гј Г«Г®ГўГіЕ™Д™Гі
+    [SerializeField] private Texture2D _defaultCursor; //Д™ГіД‘Е„Г®Д‘ Д™Г®ДѓГ¤Е• Г«Г®ГўГіЕ™Д™ДЌ Д‘Е•Е„Е„Е€Е•ГўГ«ДєГ­Е±
     private void Start()
     {
         SetTrapCursor();
