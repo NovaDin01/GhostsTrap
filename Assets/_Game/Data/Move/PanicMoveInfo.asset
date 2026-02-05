@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31cd386a7eda4efc95d3de702c146162, type: 3}
   m_Name: PanicMoveInfo
   m_EditorClassIdentifier: Assembly-CSharp::RandomMoveSO
-  speed: 5
+  speed: 6
   minDistance: 2
   maxDistance: 4
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleRadius: 0.2
