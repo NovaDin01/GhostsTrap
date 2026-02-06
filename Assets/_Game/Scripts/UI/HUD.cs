@@ -14,7 +14,7 @@ public class HUD : MonoBehaviour
 
     private void UpdateTimer()
     {
-        float time = Mathf.Max(0f, EnemySpawner.Instance.RemainingTime);
+        float time = Mathf.Max(0f, EnemySpawner.Instance.ElapsedTime);
 
         int minutes = Mathf.FloorToInt(time / 60f);
         int seconds = Mathf.FloorToInt(time % 60f);

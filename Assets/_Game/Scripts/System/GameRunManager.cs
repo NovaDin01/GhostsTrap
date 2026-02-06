@@ -11,8 +11,6 @@ public class GameRunManager : MonoBehaviour
 
     [Header("Optional title text")]
     [SerializeField] private string defeatTitle = "Поражение";
-    [SerializeField] private string winTitle = "Забег завершен";
-
     [SerializeField] private AudioClip mainMusic;
     [SerializeField] private AudioClip endMusic;
     [SerializeField] private AudioSource audioSource;
@@ -91,8 +89,6 @@ public class GameRunManager : MonoBehaviour
         if (enemySpawner != null && !_spawnerSubscribed)
         {
             enemySpawner.OnEnemySpawned += HandleEnemySpawned;
-            enemySpawner.OnLocationsCompleted += HandleLocationCompleted;
-            enemySpawner.OnRunCompleted += HandleRunCompleted;
             _spawnerSubscribed = true;
         }
 
@@ -114,8 +110,6 @@ public class GameRunManager : MonoBehaviour
         if (enemySpawner != null && _spawnerSubscribed)
         {
             enemySpawner.OnEnemySpawned -= HandleEnemySpawned;
-            enemySpawner.OnLocationsCompleted -= HandleLocationCompleted;
-            enemySpawner.OnRunCompleted -= HandleRunCompleted;
             _spawnerSubscribed = false;
         }
 
@@ -151,21 +145,9 @@ public class GameRunManager : MonoBehaviour
         _stats.RegisterEnemyCollected();
     }
 
-    private void HandleLocationCompleted(int completed)
-    {
-        _stats.RegisterLocationCompleted();
-    }
-
     private void HandleMoneyAdded(int amount)
     {
         _stats.RegisterMoneyEarned(amount);
-    }
-
-    private void HandleRunCompleted()
-    {
-        if (_runEnded) return;
-        _runEnded = true;
-        EndRun(winTitle, false);
     }
 
     private void HandlePlayerDied()

@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public enum Location
@@ -30,15 +31,14 @@ public class EnemySpawner : MonoBehaviour
     }
 
     [Serializable]
-    public class TimerStageConfig
+    public class EndlessStageConfig
     {
-        public string stageName;
-        [Header("Кого спавним на этом этапе таймера")]
+        [Min(0f)] public float startsAfterSeconds;
+        [Header("Кого спавним после этой секунды")]
         public List<EnemyEntry> enemies = new();
         [Min(0)] public int maxAlive = 10;
         [Min(0f)] public float spawnCooldown = 2f;
     }
-
 
     [Serializable]
     public class LocationConfig
@@ -55,14 +55,14 @@ public class EnemySpawner : MonoBehaviour
         [Header("Стартовая точка игрока")]
         public Transform playerSpawnPoint;
 
-        [Header("Дефолтные настройки спавна (если нет этапов таймера)")]
+        [Header("Дефолтные настройки спавна (если нет подходящего этапа)")]
         public int defaultMaxAlive = 10;
         public float defaultSpawnCooldown = 2f;
 
-        [Header("Настройки этапов таймера (по уровням 1..4)")]
-        public List<TimerStageConfig> timerStages = new();
+        [Header("Настройки этапов бесконечного таймера")]
+        [FormerlySerializedAs("timerStages")]
+        public List<EndlessStageConfig> endlessStages = new();
     }
-
 
     [Header("Configs")]
     [SerializeField] private List<LocationConfig> _locations = new();
@@ -70,56 +70,28 @@ public class EnemySpawner : MonoBehaviour
     [Header("Runtime refs")]
     [SerializeField] private Player _player;
 
-    [Header("Timer settings")]
-    [SerializeField] private float _roundDuration = 120f;   // 2 минуты
-    [SerializeField] private float _levelInterval = 30f;    // каждые 30 секунд +1 lvl
-    [SerializeField] private int _maxTimerLvl = 4;          // 1..4
-    [SerializeField] private float _transitionDuration = 2.0f; // сколько длится анимация перехода
-
-    [Header("Run settings")]
-    [SerializeField] private int _locationsToComplete = 0; // 0 или меньше = бесконечно
-
-    [Header("Transition animation")]
-    [SerializeField] private Transform _transitionTarget;
-    [SerializeField] private Animator _doorAnimator;
-    [SerializeField] private string _doorOpenTrigger = "Open";
-    [SerializeField] private Animator _playerAnimator;
-    [SerializeField] private string _playerEnterTrigger = "Enter";
-
-    [Header("Transition fade")]
-    [SerializeField] private CanvasGroup _fadeCanvasGroup;
-    [SerializeField] private float _fadeDuration = 0.5f;
-
-
     // events
-    public event Action<int> OnTimerLevelChanged;           // когда lvl повысился
-    public event Action<float> OnTimerTick;                // если надо UI (остаток времени)
-    public event Action<Location> OnLocationStarted;        // локация стартовала
-    public event Action<Location> OnLocationFinished;       // 2 минуты закончились (перед переходом)
-    public event Action<Enemy> OnEnemySpawned;              // для статистики
-    public event Action<int> OnLocationsCompleted;          // прогресс по локациям
-    public event Action OnRunCompleted;                     // завершили N локаций
+    public event Action<int> OnTimerLevelChanged;
+    public event Action<float> OnTimerTick;
+    public event Action<Location> OnLocationStarted;
+    public event Action<Enemy> OnEnemySpawned;
 
-
-    public float RemainingTime => _remainingTime;
+    public float ElapsedTime => _elapsedTime;
+    public float RemainingTime => _elapsedTime;
     public int TimerLvl => _timerLvl;
     public Location CurrentLocation => _currentLocation;
-    public int LocationsCompleted => _locationsCompleted;
 
     private Location _currentLocation;
     private LocationConfig _currentConfig;
 
-    private float _remainingTime;
+    private float _elapsedTime;
     private float _spawnTimer;
 
-    private int _timerLvl;         // 1..4
+    private int _timerLvl;
     private int _currentCount;
     private int _allCount;
     private float _spawnCooldown;
     private List<EnemyEntry> _stageEnemies;
-    private int _locationsCompleted;
-    private bool _runCompleted;
-    private Coroutine _transitionCoroutine;
 
     private readonly HashSet<Enemy> _aliveEnemies = new();
 
@@ -128,7 +100,6 @@ public class EnemySpawner : MonoBehaviour
 
     private void Awake()
     {
-        // singleton
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
@@ -146,7 +117,7 @@ public class EnemySpawner : MonoBehaviour
             enabled = false;
             return;
         }
-        
+
         _spawningEnabled = false;
     }
 
@@ -154,16 +125,11 @@ public class EnemySpawner : MonoBehaviour
     {
         if (!_spawningEnabled) return;
 
-// ---- TIMER: 120 -> 0 ----
-        _remainingTime = Mathf.Max(0f, _remainingTime - Time.deltaTime);
-        OnTimerTick?.Invoke(_remainingTime);
+        _elapsedTime += Time.deltaTime;
+        OnTimerTick?.Invoke(_elapsedTime);
 
-        // вычисляем lvl по прошедшему времени: каждые 30 сек +1
-        float elapsed = _roundDuration - _remainingTime;
-        int computedLvl = _levelInterval > 0f
-            ? Mathf.Clamp(1 + Mathf.FloorToInt(elapsed / _levelInterval), 1, _maxTimerLvl)
-            : 1;
-
+        int activeStageIndex = GetActiveStageIndex(_elapsedTime);
+        int computedLvl = activeStageIndex + 1;
         if (computedLvl != _timerLvl)
         {
             _timerLvl = computedLvl;
@@ -171,14 +137,6 @@ public class EnemySpawner : MonoBehaviour
             OnTimerLevelChanged?.Invoke(_timerLvl);
         }
 
-        // конец раунда (2 минуты)
-        if (_remainingTime <= 0f)
-        {
-            FinishLocation();
-            return;
-        }
-
-        // ---- SPAWN ----
         _spawnTimer -= Time.deltaTime;
 
         if (_spawnTimer <= 0f && _currentCount < _allCount)
@@ -188,14 +146,10 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    // -------------------- PUBLIC API --------------------
-
     public void StartGame()
     {
         if (_hasStarted) return;
         _hasStarted = true;
-        _locationsCompleted = 0;
-        _runCompleted = false;
         StartLocation(_locations[0].location);
     }
 
@@ -219,7 +173,6 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-
         if (_currentConfig.enemies == null || _currentConfig.enemies.Count == 0)
         {
             Debug.LogError($"EnemySpawner: у локации {location} нет enemies.");
@@ -234,18 +187,11 @@ public class EnemySpawner : MonoBehaviour
 
         Enemy.SetFrozen(false);
 
-        if (_fadeCanvasGroup != null)
-        {
-            _fadeCanvasGroup.alpha = 0f;
-            _fadeCanvasGroup.blocksRaycasts = false;
-        }
-
-        // reset round
         _spawningEnabled = true;
-        _remainingTime = _roundDuration;
+        _elapsedTime = 0f;
         _spawnTimer = 0f;
 
-        _timerLvl = 1;
+        _timerLvl = GetActiveStageIndex(0f) + 1;
         _currentCount = 0;
 
         ApplyLevelSettings(_timerLvl);
@@ -253,149 +199,11 @@ public class EnemySpawner : MonoBehaviour
         OnLocationStarted?.Invoke(_currentLocation);
     }
 
-    // вызови это извне, если хочешь принудительно перейти к следующей локации
-    public void GoNextLocation()
-    {
-        Location next = GetNextLocation(_currentLocation);
-        StartLocation(next);
-    }
-
-    // -------------------- CORE --------------------
-
-    private void FinishLocation()
-    {
-        _spawningEnabled = false;
-        Enemy.SetFrozen(true);
-        OnLocationFinished?.Invoke(_currentLocation);
-
-        _locationsCompleted++;
-        OnLocationsCompleted?.Invoke(_locationsCompleted);
-
-        if (_locationsToComplete > 0 && _locationsCompleted >= _locationsToComplete)
-        {
-            _runCompleted = true;
-            OnRunCompleted?.Invoke();
-            return;
-        }
-
-        // например триггер анимации
-        // _player.PlayTransitionAnimation();
-        _transitionCoroutine = StartCoroutine(TransitionToNextLocation());
-    }
-
-    private System.Collections.IEnumerator TransitionToNextLocation()
-    {
-        yield return PlayTransitionAnimation();
-        yield return Fade(1f);
-        ClearAliveEnemies();
-        GoNextLocation();
-        yield return Fade(0f);
-        Enemy.SetFrozen(false);
-        if (_player != null)
-        {
-            _player.enabled = true;
-        }
-    }
-
-    private System.Collections.IEnumerator PlayTransitionAnimation()
-    {
-        if (_player == null)
-        {
-            if (_transitionDuration > 0f)
-            {
-                yield return new WaitForSeconds(_transitionDuration);
-            }
-
-            yield break;
-        }
-
-        _player.enabled = false;
-
-        if (_doorAnimator != null && !string.IsNullOrWhiteSpace(_doorOpenTrigger))
-        {
-            _doorAnimator.SetTrigger(_doorOpenTrigger);
-        }
-
-        if (_playerAnimator != null && !string.IsNullOrWhiteSpace(_playerEnterTrigger))
-        {
-            _playerAnimator.SetTrigger(_playerEnterTrigger);
-        }
-
-        if (_transitionTarget == null || _transitionDuration <= 0f)
-        {
-            if (_transitionDuration > 0f)
-            {
-                yield return new WaitForSeconds(_transitionDuration);
-            }
-
-            yield break;
-        }
-
-        Vector3 startPosition = _player.transform.position;
-        float elapsed = 0f;
-
-        while (elapsed < _transitionDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / _transitionDuration);
-            _player.transform.position = Vector3.Lerp(startPosition, _transitionTarget.position, t);
-            yield return null;
-        }
-
-        _player.transform.position = _transitionTarget.position;
-    }
-
-
-    private void ClearAliveEnemies()
-    {
-        if (_aliveEnemies.Count == 0) return;
-
-        var enemies = new List<Enemy>(_aliveEnemies);
-        _aliveEnemies.Clear();
-
-        foreach (var enemy in enemies)
-        {
-            if (enemy == null) continue;
-            Destroy(enemy.gameObject);
-        }
-
-        _currentCount = 0;
-    }
-
-    private System.Collections.IEnumerator Fade(float targetAlpha)
-    {
-        if (_fadeCanvasGroup == null)
-        {
-            if (_fadeDuration > 0f)
-            {
-                yield return new WaitForSeconds(_fadeDuration);
-            }
-
-            yield break;
-        }
-
-        _fadeCanvasGroup.blocksRaycasts = targetAlpha > 0f;
-        float startAlpha = _fadeCanvasGroup.alpha;
-        float elapsed = 0f;
-        float duration = Mathf.Max(0.01f, _fadeDuration);
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            _fadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
-            yield return null;
-        }
-
-        _fadeCanvasGroup.alpha = targetAlpha;
-        _fadeCanvasGroup.blocksRaycasts = targetAlpha > 0f;
-    }
-
     private void ApplyLevelSettings(int lvl)
     {
-        int idx = Mathf.Clamp(lvl - 1, 0, _maxTimerLvl - 1);
+        int idx = lvl - 1;
 
-        TimerStageConfig stage = GetStageConfig(idx);
+        EndlessStageConfig stage = GetStageConfig(idx);
         if (stage != null)
         {
             _allCount = Mathf.Max(0, stage.maxAlive);
@@ -443,16 +251,12 @@ public class EnemySpawner : MonoBehaviour
         return points[Random.Range(0, points.Count)];
     }
 
-
-
     private void OnEnemyDespawned(Enemy enemy)
     {
         enemy.OnDespawned -= OnEnemyDespawned;
         _aliveEnemies.Remove(enemy);
         _currentCount = Mathf.Max(0, _currentCount - 1);
     }
-
-    // -------------------- HELPERS --------------------
 
     private LocationConfig GetConfig(Location loc)
     {
@@ -463,30 +267,52 @@ public class EnemySpawner : MonoBehaviour
         return null;
     }
 
-    private TimerStageConfig GetStageConfig(int stageIndex)
+    private int GetActiveStageIndex(float elapsedSeconds)
     {
-        if (_currentConfig == null || _currentConfig.timerStages == null || _currentConfig.timerStages.Count == 0)
+        if (_currentConfig == null || _currentConfig.endlessStages == null || _currentConfig.endlessStages.Count == 0)
+        {
+            return 0;
+        }
+
+        int bestIndex = -1;
+        float bestTime = float.MinValue;
+
+        for (int i = 0; i < _currentConfig.endlessStages.Count; i++)
+        {
+            EndlessStageConfig stage = _currentConfig.endlessStages[i];
+            if (stage == null) continue;
+
+            float stageStart = Mathf.Max(0f, stage.startsAfterSeconds);
+            if (stageStart <= elapsedSeconds && stageStart >= bestTime)
+            {
+                bestTime = stageStart;
+                bestIndex = i;
+            }
+        }
+
+        return bestIndex;
+    }
+
+    private EndlessStageConfig GetStageConfig(int stageIndex)
+    {
+        if (_currentConfig == null || _currentConfig.endlessStages == null || _currentConfig.endlessStages.Count == 0)
         {
             return null;
         }
 
-        if (stageIndex < 0) stageIndex = 0;
-        if (stageIndex >= _currentConfig.timerStages.Count)
+        if (stageIndex < 0) return null;
+        if (stageIndex >= _currentConfig.endlessStages.Count)
         {
-            stageIndex = _currentConfig.timerStages.Count - 1;
+            stageIndex = _currentConfig.endlessStages.Count - 1;
         }
 
-        return _currentConfig.timerStages[stageIndex];
+        return _currentConfig.endlessStages[stageIndex];
     }
 
     public void StopRun()
     {
         _spawningEnabled = false;
-        if (_transitionCoroutine != null)
-        {
-            StopCoroutine(_transitionCoroutine);
-            _transitionCoroutine = null;
-        }
+        Enemy.SetFrozen(true);
     }
 
     private static EnemyEntry PickEnemyEntryByWeight(List<EnemyEntry> entries)
@@ -509,22 +335,5 @@ public class EnemySpawner : MonoBehaviour
         }
 
         return entries[entries.Count - 1];
-    }
-
-    private Location GetNextLocation(Location current)
-    {
-        if (_locations != null && _locations.Count > 0)
-        {
-            int currentIndex = _locations.FindIndex(config => config.location == current);
-            if (currentIndex >= 0)
-            {
-                int nextIndex = (currentIndex + 1) % _locations.Count;
-                return _locations[nextIndex].location;
-            }
-        }
-
-        int count = Enum.GetValues(typeof(Location)).Length;
-        int enumIndex = ((int)current + 1) % count;
-        return (Location)enumIndex;
     }
 }
