@@ -137,18 +137,13 @@ public class GameRunManager : MonoBehaviour
     {
         if (_runEnded) return;
         _runEnded = true;
-        EndRun(defeatTitle, true);
+        EndRun(defeatTitle);
     }
 
-    private void EndRun(string title, bool showDefeatAd)
+    private void EndRun(string title)
     {
         _stats.StopRun();
         if (enemySpawner != null) enemySpawner.StopRun();
-
-        if (showDefeatAd && YandexAdsBridge.Instance != null)
-        {
-            YandexAdsBridge.Instance.ShowDefeatAd();
-        }
 
         Time.timeScale = 0f;
 
