@@ -1,3 +1,4 @@
+// GameRunManager.cs (оставляю как у тебя; он и так триггерится по OnDied)
 using System;
 using UnityEngine;
 
@@ -53,20 +54,9 @@ public class GameRunManager : MonoBehaviour
 
     private void ResolveDependencies()
     {
-        if (enemySpawner == null)
-        {
-            enemySpawner = EnemySpawner.Instance;
-        }
-
-        if (player == null)
-        {
-            player = Player.Instance;
-        }
-
-        if (_moneySystem == null)
-        {
-            _moneySystem = MoneySystem.Instance;
-        }
+        if (enemySpawner == null) enemySpawner = EnemySpawner.Instance;
+        if (player == null) player = Player.Instance;
+        if (_moneySystem == null) _moneySystem = MoneySystem.Instance;
     }
 
     private void Update()
@@ -129,19 +119,12 @@ public class GameRunManager : MonoBehaviour
     private void HandleEnemySpawned(Enemy enemy)
     {
         _stats.RegisterEnemySpawned();
-        if (enemy != null)
-        {
-            enemy.OnCollectedEnemy += HandleEnemyCollected;
-        }
+        if (enemy != null) enemy.OnCollectedEnemy += HandleEnemyCollected;
     }
 
     private void HandleEnemyCollected(Enemy enemy)
     {
-        if (enemy != null)
-        {
-            enemy.OnCollectedEnemy -= HandleEnemyCollected;
-        }
-
+        if (enemy != null) enemy.OnCollectedEnemy -= HandleEnemyCollected;
         _stats.RegisterEnemyCollected();
     }
 
@@ -160,10 +143,7 @@ public class GameRunManager : MonoBehaviour
     private void EndRun(string title, bool showDefeatAd)
     {
         _stats.StopRun();
-        if (enemySpawner != null)
-        {
-            enemySpawner.StopRun();
-        }
+        if (enemySpawner != null) enemySpawner.StopRun();
 
         if (showDefeatAd && YandexAdsBridge.Instance != null)
         {
@@ -171,6 +151,7 @@ public class GameRunManager : MonoBehaviour
         }
 
         Time.timeScale = 0f;
+
         if (defeatWindow != null)
         {
             audioSource.Stop();
