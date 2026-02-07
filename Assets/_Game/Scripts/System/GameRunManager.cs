@@ -1,3 +1,4 @@
+// GameRunManager.cs (оставляю как у тебя; он и так триггерится по OnDied)
 using System;
 using UnityEngine;
 
@@ -11,8 +12,6 @@ public class GameRunManager : MonoBehaviour
 
     [Header("Optional title text")]
     [SerializeField] private string defeatTitle = "Поражение";
-    [SerializeField] private string winTitle = "Забег завершен";
-
     [SerializeField] private AudioClip mainMusic;
     [SerializeField] private AudioClip endMusic;
     [SerializeField] private AudioSource audioSource;
@@ -55,20 +54,9 @@ public class GameRunManager : MonoBehaviour
 
     private void ResolveDependencies()
     {
-        if (enemySpawner == null)
-        {
-            enemySpawner = EnemySpawner.Instance;
-        }
-
-        if (player == null)
-        {
-            player = Player.Instance;
-        }
-
-        if (_moneySystem == null)
-        {
-            _moneySystem = MoneySystem.Instance;
-        }
+        if (enemySpawner == null) enemySpawner = EnemySpawner.Instance;
+        if (player == null) player = Player.Instance;
+        if (_moneySystem == null) _moneySystem = MoneySystem.Instance;
     }
 
     private void Update()
@@ -91,8 +79,6 @@ public class GameRunManager : MonoBehaviour
         if (enemySpawner != null && !_spawnerSubscribed)
         {
             enemySpawner.OnEnemySpawned += HandleEnemySpawned;
-            enemySpawner.OnLocationsCompleted += HandleLocationCompleted;
-            enemySpawner.OnRunCompleted += HandleRunCompleted;
             _spawnerSubscribed = true;
         }
 
@@ -114,8 +100,6 @@ public class GameRunManager : MonoBehaviour
         if (enemySpawner != null && _spawnerSubscribed)
         {
             enemySpawner.OnEnemySpawned -= HandleEnemySpawned;
-            enemySpawner.OnLocationsCompleted -= HandleLocationCompleted;
-            enemySpawner.OnRunCompleted -= HandleRunCompleted;
             _spawnerSubscribed = false;
         }
 
@@ -135,37 +119,18 @@ public class GameRunManager : MonoBehaviour
     private void HandleEnemySpawned(Enemy enemy)
     {
         _stats.RegisterEnemySpawned();
-        if (enemy != null)
-        {
-            enemy.OnCollectedEnemy += HandleEnemyCollected;
-        }
+        if (enemy != null) enemy.OnCollectedEnemy += HandleEnemyCollected;
     }
 
     private void HandleEnemyCollected(Enemy enemy)
     {
-        if (enemy != null)
-        {
-            enemy.OnCollectedEnemy -= HandleEnemyCollected;
-        }
-
+        if (enemy != null) enemy.OnCollectedEnemy -= HandleEnemyCollected;
         _stats.RegisterEnemyCollected();
-    }
-
-    private void HandleLocationCompleted(int completed)
-    {
-        _stats.RegisterLocationCompleted();
     }
 
     private void HandleMoneyAdded(int amount)
     {
         _stats.RegisterMoneyEarned(amount);
-    }
-
-    private void HandleRunCompleted()
-    {
-        if (_runEnded) return;
-        _runEnded = true;
-        EndRun(winTitle, false);
     }
 
     private void HandlePlayerDied()
@@ -178,10 +143,7 @@ public class GameRunManager : MonoBehaviour
     private void EndRun(string title, bool showDefeatAd)
     {
         _stats.StopRun();
-        if (enemySpawner != null)
-        {
-            enemySpawner.StopRun();
-        }
+        if (enemySpawner != null) enemySpawner.StopRun();
 
         if (showDefeatAd && YandexAdsBridge.Instance != null)
         {
@@ -189,6 +151,7 @@ public class GameRunManager : MonoBehaviour
         }
 
         Time.timeScale = 0f;
+
         if (defeatWindow != null)
         {
             audioSource.Stop();

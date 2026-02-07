@@ -1,3 +1,4 @@
+// PlayerHealth.cs
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,71 +6,74 @@ using UnityEngine.UI;
 public class PlayerHealth : MonoBehaviour
 {
     public static PlayerHealth Instance;
-    
+
     [SerializeField] private List<Image> heartSprites;
     [SerializeField] private Sprite fullHeart;
     [SerializeField] private Sprite emptyHeart;
     [SerializeField] private Sprite nullHeart;
 
-    private void Start()
+    private bool _subscribed;
+
+    private void Awake()
     {
-        if (Instance != null && Instance != this) Destroy(gameObject);
-        else Instance = this;
-        
-        Player.Instance.OnApplyDamage += MinusHeart;
-        Player.Instance.OnApplyHeal += PlusHeart;
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
 
-        int currentHp = Player.Instance.CurrentHp;
-        int heartsToShow = Mathf.Min(currentHp, heartSprites.Count);
-
-        foreach (var heart in heartSprites) heart.sprite = nullHeart;
-        for (int i = 0; i < heartsToShow; i++) heartSprites[i].sprite = fullHeart;
-
+        TrySubscribe();
+        RedrawFromPlayer();
     }
 
-    private void PlusHeart()
+    private void OnEnable()
     {
+        TrySubscribe();
+        RedrawFromPlayer();
+    }
+
+    private void TrySubscribe()
+    {
+        if (_subscribed) return;
+        if (Player.Instance == null) return;
+
+        Player.Instance.OnHpChanged += HandleHpChanged;
+        _subscribed = true;
+    }
+
+    private void HandleHpChanged(int current, int max)
+    {
+        Redraw(current, max);
+    }
+
+    private void RedrawFromPlayer()
+    {
+        if (Player.Instance == null) return;
+        Redraw(Player.Instance.CurrentHp, Player.Instance.MaxHp);
+    }
+
+    private void Redraw(int currentHp, int maxHp)
+    {
+        if (heartSprites == null) return;
+
         for (int i = 0; i < heartSprites.Count; i++)
         {
-            if (heartSprites[i].sprite == emptyHeart)
+            if (heartSprites[i] == null) continue;
+
+            if (i >= maxHp)
             {
-                heartSprites[i].sprite = fullHeart;
-                return;
+                heartSprites[i].sprite = nullHeart;
             }
-        }
-    }
-
-    public void PlusMaxHeart()
-    {
-        for (int i = 0; i < heartSprites.Count; i++)
-        {
-            if (heartSprites[i].sprite == nullHeart)
+            else
             {
-                heartSprites[i].sprite = emptyHeart;
-                return;
-            }
-        }
-    }
-
-
-    private void MinusHeart()
-    {
-        for (int i = heartSprites.Count - 1; i >= 0; i--)
-        {
-            var h = heartSprites[i];
-
-            if (h.sprite == fullHeart)
-            {
-                h.sprite = emptyHeart;
-                return;
+                heartSprites[i].sprite = (i < currentHp) ? fullHeart : emptyHeart;
             }
         }
     }
 
     private void OnDestroy()
     {
-        if (Player.Instance == null) return;
-        Player.Instance.OnApplyDamage -= MinusHeart;
-        Player.Instance.OnApplyHeal -= PlusHeart;
+        if (Player.Instance != null && _subscribed)
+        {
+            Player.Instance.OnHpChanged -= HandleHpChanged;
+            _subscribed = false;
+        }
     }
 }

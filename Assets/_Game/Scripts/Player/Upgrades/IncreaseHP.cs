@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// IncreaseHP.cs (unchanged in logic)
+using UnityEngine;
 
 public class IncreaseHP : Upgrade
 {
