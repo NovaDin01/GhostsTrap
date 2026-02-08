@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   enemySpawner: {fileID: 762004092}
-  gameRunManager: {fileID: 0}
+  gameRunManager: {fileID: 743795}
   systemsToEnable:
   - {fileID: 735677610}
   - {fileID: 593168353}
@@ -186,6 +186,9 @@ MonoBehaviour:
   enemySpawner: {fileID: 762004092}
   player: {fileID: 8299453368715849419}
   defeatWindow: {fileID: 2650194425184883013}
+  UIObjects:
+  - {fileID: 1855023572}
+  - {fileID: 1209481514}
   defeatTitle: "\u041F\u043E\u0440\u0430\u0436\u0435\u043D\u0438\u0435"
   mainMusic: {fileID: 8300000, guid: 548bc46c2e9717646b264cb3b4f44d08, type: 3}
   endMusic: {fileID: 8300000, guid: 3f21b40867c8f624ba62db027e73fcf8, type: 3}
@@ -206,7 +209,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &79819866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1824,7 +1827,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97d489938949e7c4bb50d0b565c62998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PauseManager
-  pausePanel: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1924,9 +1926,9 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.00007510185
+    x: 0
     y: 0
-    width: 0.9998498
+    width: 1
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
@@ -2561,7 +2563,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.16818908}
   m_AnchorMax: {x: 1, y: 0.7692971}
-  m_AnchoredPosition: {x: -43.382812, y: -72.99999}
+  m_AnchoredPosition: {x: -43.382812, y: -73}
   m_SizeDelta: {x: -331.49, y: -63.96}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &747419741
@@ -8022,7 +8024,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.1383987, y: 0.10079985}
   m_AnchorMax: {x: 0.37300003, y: 0.1814594}
-  m_AnchoredPosition: {x: 147.92966, y: 24.75}
+  m_AnchoredPosition: {x: 147.9296, y: 24.75}
   m_SizeDelta: {x: -6.94, y: 30.34}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8299453368715849419
@@ -8042,11 +8044,8 @@ MonoBehaviour:
   startGridCount: 1
   startTime2Attack: 0.8
   startMaxHp: 3
-  damageInvulnerabilityDuration: 0.4
+  damageInvulnerabilityDuration: 0
   animator: {fileID: 251508374588884273}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 0
   gridPrefab: {fileID: -2401509042453229422, guid: d90a16f49823d464db89458cd6b171f7, type: 3}
   lootsMask:
     serializedVersion: 2
