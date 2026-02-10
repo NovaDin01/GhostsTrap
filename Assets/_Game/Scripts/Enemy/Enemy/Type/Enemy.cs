@@ -2,34 +2,29 @@
 using _Game.Scripts.Data;
 using UnityEngine;
 
-
-
 public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 {
     [SerializeField] protected EnemyData enemyData;
     [SerializeField] protected MovementSettingsSO settingsMovement;
-    [SerializeField] private ParticleSystem armorParticleSystem;
-    [SerializeField] private GameObject armorEffect;
 
     protected Player _player;
     protected IEnemyMovement _movement;
 
     private int _hp;
-    private bool _hasArmor;
+    private IEnemyArmor _armor;
     protected bool _isCaught;
     private bool _isDead;
 
     private bool despawnNotified;
-    
+
     public event Action OnAttack;
     public void RaiseAttack() => OnAttack?.Invoke();
-
 
     public TypeAward AwardType => TypeAward.Money;
     public int AwardValue => enemyData.Award;
 
-    public event Action<Enemy> OnCollectedEnemy; // для наград/эффектов
-    public event Action<Enemy> OnDespawned;      // для спавнера (лимит живых)
+    public event Action<Enemy> OnCollectedEnemy;
+    public event Action<Enemy> OnDespawned;
     public event Action OnArmorBroken;
     public event Action OnCaught;
     public event Action<int> OnDamaged;
@@ -44,7 +39,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 
     public virtual void Awake()
     {
-        _hasArmor = enemyData.HasArmor;
+        _armor = GetComponent<IEnemyArmor>();
         _hp = enemyData.Hp;
     }
 
@@ -53,9 +48,9 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         _isCaught = false;
         despawnNotified = false;
         _isDead = false;
-        armorEffect.SetActive(true);
 
-        _hasArmor = enemyData.HasArmor;
+        _armor = GetComponent<IEnemyArmor>();
+        _armor?.ResetArmor();
         _hp = enemyData.Hp;
     }
 
@@ -96,13 +91,13 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         if (_isCaught) return CatchResult.AlreadyCaught;
         if (_hp > 0) return CatchResult.Resisted;
 
-        if (_hasArmor)
+        if (_armor != null && _armor.HasArmor)
         {
-            BreakArmor();
+            _armor.TryBreakArmor();
             OnArmorBroken?.Invoke();
-            if (!Player.Instance.IsAbilityActive) 
+            if (!Player.Instance.IsAbilityActive)
                 return CatchResult.Resisted;
-            
+
             AttachToCatcher(catcher);
             _isCaught = true;
             OnCaught?.Invoke();
@@ -121,14 +116,6 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         transform.position = catcher.position;
     }
 
-    protected void BreakArmor()
-    {
-        _hasArmor = false;
-        //if(armorParticleSystem != null) armorParticleSystem.Stop();
-        
-        if(armorEffect != null) armorEffect.SetActive(false);
-    }
-
     public void ApplyDamage(int amount)
     {
         if (_isDead) return;
@@ -140,7 +127,6 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
             _isDead = true;
             OnDeath?.Invoke();
         }
-        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
