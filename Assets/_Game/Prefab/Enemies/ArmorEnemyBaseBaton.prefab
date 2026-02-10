@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f252a9b923ec4ea99b65cf626b8cfb61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPresentation
-  config: {fileID: 11400000, guid: a8b236c31a45ba6419dd671747026ac2, type: 2}
+  config: {fileID: 11400000, guid: 9be82b4c714f4ceca2862117c13f3029, type: 2}
   animator: {fileID: 6045014586344643162}
   audioSource: {fileID: 5315558892548039949}
   vfxRoot: {fileID: 0}
