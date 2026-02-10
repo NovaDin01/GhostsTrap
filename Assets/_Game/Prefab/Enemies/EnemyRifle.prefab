@@ -178,8 +178,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PoliceBaton
   enemyData: {fileID: 11400000, guid: f87b9944ff92de0488f9fc22d89c2d80, type: 2}
-  settingsMovement: {fileID: 11400000, guid: a57bfc76f2f24504a9943e269cc5282d, type: 2}
-  setting: {fileID: 11400000, guid: d5321146f55d6534fb089239a3d3373a, type: 2}
+  settingsMovement: {fileID: 11400000, guid: 0dc19aed62234897bdd0c6bbd748c83c, type: 2}
+  setting: {fileID: 11400000, guid: b666625894b64d2cb5e9e4b86336afd4, type: 2}
 --- !u!50 &2642293632419150381
 Rigidbody2D:
   serializedVersion: 5

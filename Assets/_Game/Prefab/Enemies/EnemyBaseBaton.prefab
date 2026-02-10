@@ -134,10 +134,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttacker
   enemyData: {fileID: 11400000, guid: 725cd4b11d728354a80072538d452722, type: 2}
-  settingsMovement: {fileID: 11400000, guid: 952dba670704e2845a184d0198f68ae6, type: 2}
+  settingsMovement: {fileID: 11400000, guid: 0c6f646966434867bf72f5a844cdfa71, type: 2}
   armorParticleSystem: {fileID: 7472931285715936840}
   armorEffect: {fileID: 8510047995920934760}
-  setting: {fileID: 11400000, guid: 358b5c8e1aa9bd1488a556e272f675c2, type: 2}
+  setting: {fileID: 11400000, guid: 72a2589a26da47a78e6c4e05e4409a48, type: 2}
 --- !u!114 &1877195403639822359
 MonoBehaviour:
   m_ObjectHideFlags: 0

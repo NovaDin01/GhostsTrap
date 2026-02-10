@@ -134,9 +134,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb223e25a8cf03c4398a42e3d0a4d385, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttacker
-  enemyData: {fileID: 11400000, guid: 725cd4b11d728354a80072538d452722, type: 2}
-  settingsMovement: {fileID: 11400000, guid: 952dba670704e2845a184d0198f68ae6, type: 2}
-  setting: {fileID: 11400000, guid: 358b5c8e1aa9bd1488a556e272f675c2, type: 2}
+  enemyData: {fileID: 11400000, guid: fc2e53564ee774e46929671218dd5c9c, type: 2}
+  settingsMovement: {fileID: 11400000, guid: 5161c7d5db7f426a9528bf80df35933e, type: 2}
+  setting: {fileID: 11400000, guid: 0da7b84e1d5f47f8983109180975f3b4, type: 2}
 --- !u!114 &1877195403639822359
 MonoBehaviour:
   m_ObjectHideFlags: 0
