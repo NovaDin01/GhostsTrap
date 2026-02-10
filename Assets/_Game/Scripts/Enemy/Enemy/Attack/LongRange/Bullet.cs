@@ -32,7 +32,7 @@ public class Bullet : MonoBehaviour
             Destroy(gameObject);
         }
 
-        if (other.gameObject.TryGetComponent<Grid>(out var grid))
+        if (other.gameObject.TryGetComponent<GridNet>(out var component))
         {
             VisualEffects.Instance.PlayBulletHit(transform.position);
             Destroy(gameObject);

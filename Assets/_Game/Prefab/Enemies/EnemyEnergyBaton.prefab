@@ -33,8 +33,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -11.93, y: -10.53, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 3.3000002, y: 3.3000002, z: 1.1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -88,7 +88,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: f68ae5337576d5043884f8598c2c6b8b, type: 3}
-  m_Color: {r: 0.023584902, g: 0.22232638, b: 1, a: 1}
+  m_Color: {r: 0.02352941, g: 1, b: 0.725096, a: 1}
   m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
@@ -107,7 +107,7 @@ Animator:
   m_GameObject: {fileID: 204177697925766313}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 28fdd37ef6dc5f2468c9a95a90bb2496, type: 2}
+  m_Controller: {fileID: 9100000, guid: 8d1a9959d74f97f4990a3b6d367decfe, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttacker
   enemyData: {fileID: 11400000, guid: 725cd4b11d728354a80072538d452722, type: 2}
-  settingsMovement: {fileID: 11400000, guid: 952dba670704e2845a184d0198f68ae6, type: 2}
+  settingsMovement: {fileID: 11400000, guid: cc8abef9895c5434e9ba738626cfcb5e, type: 2}
   setting: {fileID: 11400000, guid: 6a489af29663f4841bd8c205acf1d0cc, type: 2}
 --- !u!114 &1877195403639822359
 MonoBehaviour:

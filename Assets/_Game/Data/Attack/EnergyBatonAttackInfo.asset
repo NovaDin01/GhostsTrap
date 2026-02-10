@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: EnergyBatonAttackInfo
   m_EditorClassIdentifier: Assembly-CSharp::BatonAttackSO
   damage: 2
-  speedFire: 3
-  rangeFire: 2
+  speedFire: 2
+  rangeFire: 1.5

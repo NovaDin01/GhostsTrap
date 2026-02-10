@@ -2816,81 +2816,86 @@ MonoBehaviour:
     enemies:
     - prefab: {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
       role: 0
-      weight: 50
-    - prefab: {fileID: 2241762141304221049, guid: 040461ff01aaec24383196808a239759, type: 3}
-      role: 1
-      weight: 25
+      weight: 1
     - prefab: {fileID: 8954939864138724390, guid: f8bdbb93bfadc73439a426f5fcde8ab2, type: 3}
       role: 1
-      weight: 60
+      weight: 1
+    - prefab: {fileID: 2241762141304221049, guid: 040461ff01aaec24383196808a239759, type: 3}
+      role: 1
+      weight: 1
     - prefab: {fileID: 8954939864138724390, guid: 204649f1d0f2c7e41b9400723c1378c1, type: 3}
       role: 1
-      weight: 25
+      weight: 1
     scientistSpawnPoints:
     - {fileID: 117861404}
     - {fileID: 1844997110}
-    - {fileID: 1438563039}
     - {fileID: 749006167}
+    - {fileID: 1438563039}
     soldierSpawnPoints:
     - {fileID: 127401258}
     - {fileID: 791333182}
     - {fileID: 300455787}
-    - {fileID: 365785301}
     - {fileID: 879987926}
     - {fileID: 1233051739}
     playerSpawnPoint: {fileID: 4114231979937549154}
-    defaultMaxAlive: 10
-    defaultSpawnCooldown: 2
+    defaultMaxAlive: 5
+    defaultSpawnCooldown: 1
     endlessStages:
     - startsAfterSeconds: 0
       enemies:
       - prefab: {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
         role: 0
-        weight: 30
-      - prefab: {fileID: 2241762141304221049, guid: 040461ff01aaec24383196808a239759, type: 3}
-        role: 1
-        weight: 30
-      maxAlive: 6
-      spawnCooldown: 2
-    - startsAfterSeconds: 5
-      enemies:
-      - prefab: {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
-        role: 0
-        weight: 60
+        weight: 1
       - prefab: {fileID: 8954939864138724390, guid: f8bdbb93bfadc73439a426f5fcde8ab2, type: 3}
         role: 1
-        weight: 40
-      maxAlive: 12
-      spawnCooldown: 1.5
-    - startsAfterSeconds: 10
-      enemies:
-      - prefab: {fileID: 2241762141304221049, guid: 040461ff01aaec24383196808a239759, type: 3}
-        role: 1
-        weight: 30
-      - prefab: {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
-        role: 0
-        weight: 20
-      - prefab: {fileID: 8954939864138724390, guid: f8bdbb93bfadc73439a426f5fcde8ab2, type: 3}
-        role: 1
-        weight: 50
-      - prefab: {fileID: 8954939864138724390, guid: 204649f1d0f2c7e41b9400723c1378c1, type: 3}
-        role: 1
-        weight: 30
-      maxAlive: 15
+        weight: 1
+      maxAlive: 10
       spawnCooldown: 1
-    - startsAfterSeconds: 15
+    - startsAfterSeconds: 30
       enemies:
+      - prefab: {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
+        role: 0
+        weight: 50
       - prefab: {fileID: 8954939864138724390, guid: f8bdbb93bfadc73439a426f5fcde8ab2, type: 3}
         role: 1
-        weight: 40
-      - prefab: {fileID: 8954939864138724390, guid: 204649f1d0f2c7e41b9400723c1378c1, type: 3}
-        role: 1
-        weight: 60
+        weight: 25
       - prefab: {fileID: 2241762141304221049, guid: 040461ff01aaec24383196808a239759, type: 3}
         role: 1
-        weight: 60
-      maxAlive: 18
-      spawnCooldown: 0.7
+        weight: 25
+      maxAlive: 10
+      spawnCooldown: 1
+    - startsAfterSeconds: 30
+      enemies:
+      - prefab: {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
+        role: 0
+        weight: 25
+      - prefab: {fileID: 8954939864138724390, guid: f8bdbb93bfadc73439a426f5fcde8ab2, type: 3}
+        role: 1
+        weight: 25
+      - prefab: {fileID: 8954939864138724390, guid: 204649f1d0f2c7e41b9400723c1378c1, type: 3}
+        role: 1
+        weight: 25
+      - prefab: {fileID: 2241762141304221049, guid: 040461ff01aaec24383196808a239759, type: 3}
+        role: 1
+        weight: 25
+      maxAlive: 10
+      spawnCooldown: 1
+    - startsAfterSeconds: 30
+      enemies:
+      - prefab: {fileID: 8954939864138724390, guid: 204649f1d0f2c7e41b9400723c1378c1, type: 3}
+        role: 1
+        weight: 0
+      - prefab: {fileID: 8954939864138724390, guid: f8bdbb93bfadc73439a426f5fcde8ab2, type: 3}
+        role: 1
+        weight: 33
+      - prefab: {fileID: 8954939864138724390, guid: 204649f1d0f2c7e41b9400723c1378c1, type: 3}
+        role: 1
+        weight: 33
+      - prefab: {fileID: 2241762141304221049, guid: 040461ff01aaec24383196808a239759, type: 3}
+        role: 1
+        weight: 33
+      maxAlive: 10
+      spawnCooldown: 1
   _player: {fileID: 8299453368715849419}
 --- !u!1 &788755128
 GameObject:
@@ -8024,7 +8029,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.1383987, y: 0.10079985}
   m_AnchorMax: {x: 0.37300003, y: 0.1814594}
-  m_AnchoredPosition: {x: 147.9296, y: 24.75}
+  m_AnchoredPosition: {x: 147.92953, y: 24.75}
   m_SizeDelta: {x: -6.94, y: 30.34}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8299453368715849419
