@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 163a6294014b4503b3eddaacf618512f, type: 3}
-  m_Name: EnergyButtonAttackInfo
+  m_Name: ArmorEnergyBatonAttackInfo
   m_EditorClassIdentifier: Assembly-CSharp::BatonAttackSO
   damage: 2
   speedFire: 2
