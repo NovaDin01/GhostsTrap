@@ -24,3 +24,12 @@ MonoBehaviour:
     ParticlePrefab: {fileID: 0}
     UseWorldPosition: 0
     PositionOffset: {x: 0, y: 0, z: 0}
+  - EventType: 4
+    AnimatorTrigger: ArmorBroken
+    SfxClip:
+    - {fileID: 8300000, guid: 60a7cc8327dce3c499079c1ab4baab8e, type: 3}
+    SfxVolume: 0.603
+    VfxPrefab: {fileID: 0}
+    ParticlePrefab: {fileID: 6153524778299975873, guid: 08e46225b914f1343a782796143d875c, type: 3}
+    UseWorldPosition: 0
+    PositionOffset: {x: 0, y: 0, z: 0}

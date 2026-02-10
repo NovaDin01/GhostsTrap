@@ -6,7 +6,7 @@ public class PauseManager : MonoBehaviour
     public static PauseManager Instance;
     public static bool IsPaused { get; private set; }
 
-    [SerializeField] private GameObject pausePanel;
+    //[SerializeField] private GameObject pausePanel;
 
     private void Awake()
     {
@@ -24,13 +24,11 @@ public class PauseManager : MonoBehaviour
     {
         Time.timeScale = 0f;
         IsPaused = true;
-        pausePanel.SetActive(true);
     }
 
     private void Resume()
     {
         Time.timeScale = 1f;
         IsPaused = false;
-        pausePanel.SetActive(false);
     }
 }

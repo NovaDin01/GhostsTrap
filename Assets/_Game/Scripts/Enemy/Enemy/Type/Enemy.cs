@@ -8,6 +8,8 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
 {
     [SerializeField] protected EnemyData enemyData;
     [SerializeField] protected MovementSettingsSO settingsMovement;
+    [SerializeField] private ParticleSystem armorParticleSystem;
+    [SerializeField] private GameObject armorEffect;
 
     protected Player _player;
     protected IEnemyMovement _movement;
@@ -51,6 +53,7 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
         _isCaught = false;
         despawnNotified = false;
         _isDead = false;
+        armorEffect.SetActive(true);
 
         _hasArmor = enemyData.HasArmor;
         _hp = enemyData.Hp;
@@ -121,6 +124,9 @@ public class Enemy : MonoBehaviour, IObjectAttracted, ITakingDamage
     protected void BreakArmor()
     {
         _hasArmor = false;
+        //if(armorParticleSystem != null) armorParticleSystem.Stop();
+        
+        if(armorEffect != null) armorEffect.SetActive(false);
     }
 
     public void ApplyDamage(int amount)

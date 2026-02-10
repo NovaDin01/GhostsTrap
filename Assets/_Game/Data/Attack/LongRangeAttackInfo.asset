@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LongRangeAttackSO
   damage: 1
   speedFire: 3
-  rangeFire: 4
-  bulletCount: 2
+  rangeFire: 5
+  bulletCount: 1
   bulletDelay: 0.2
-  bulletSpeed: 10
+  bulletSpeed: 6
   bullet: {fileID: 4720098165273911428, guid: d65162c6bb0bf0a4f8c150420922cd58, type: 3}

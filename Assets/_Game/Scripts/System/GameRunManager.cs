@@ -9,6 +9,7 @@ public class GameRunManager : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Player player;
     [SerializeField] private DefeatWindow defeatWindow;
+    [SerializeField] private GameObject[] UIObjects;
 
     [Header("Optional title text")]
     [SerializeField] private string defeatTitle = "Поражение";
@@ -137,18 +138,13 @@ public class GameRunManager : MonoBehaviour
     {
         if (_runEnded) return;
         _runEnded = true;
-        EndRun(defeatTitle, true);
+        EndRun(defeatTitle);
     }
 
-    private void EndRun(string title, bool showDefeatAd)
+    private void EndRun(string title)
     {
         _stats.StopRun();
         if (enemySpawner != null) enemySpawner.StopRun();
-
-        if (showDefeatAd && YandexAdsBridge.Instance != null)
-        {
-            YandexAdsBridge.Instance.ShowDefeatAd();
-        }
 
         Time.timeScale = 0f;
 
@@ -157,6 +153,10 @@ public class GameRunManager : MonoBehaviour
             audioSource.Stop();
             audioSource.PlayOneShot(endMusic);
             defeatWindow.Show(title, _stats);
+            foreach (var obj in UIObjects)
+            {
+                obj.SetActive(false);
+            }
         }
     }
 }

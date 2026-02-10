@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Barrel
   typeAward: 0
-  minAwardValue: 1
+  minAwardValue: 2
   maxAwardValue: 5
 --- !u!61 &7443805401560061744
 BoxCollider2D:
