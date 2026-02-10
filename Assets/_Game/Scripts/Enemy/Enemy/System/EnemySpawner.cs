@@ -4,14 +4,6 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
-public enum Location
-{
-    Lab,
-    Office,
-    MilitaryBase,
-    Forest
-}
-
 public class EnemySpawner : MonoBehaviour
 {
     public static EnemySpawner Instance;
@@ -31,71 +23,53 @@ public class EnemySpawner : MonoBehaviour
     }
 
     [Serializable]
-    public class EndlessStageConfig
+    public class TimerStageConfig
     {
-        [Min(0f)] public float startsAfterSeconds;
-        [Header("Кого спавним после этой секунды")]
+        [Min(0.1f)] public float stageDuration = 10f;
+        [Header("Кого спавним на этом этапе (если пусто, используются defaultEnemies)")]
         public List<EnemyEntry> enemies = new();
         [Min(0)] public int maxAlive = 10;
         [Min(0f)] public float spawnCooldown = 2f;
     }
 
-    [Serializable]
-    public class LocationConfig
-    {
-        public Location location;
+    [Header("Enemy settings")]
+    [SerializeField] private List<EnemyEntry> defaultEnemies = new();
 
-        [Header("Кого спавним в этой локации")]
-        public List<EnemyEntry> enemies = new();
+    [Header("Spawn points")]
+    [SerializeField] private List<Transform> scientistSpawnPoints = new();
+    [SerializeField] private List<Transform> soldierSpawnPoints = new();
 
-        [Header("Точки спавна")]
-        public List<Transform> scientistSpawnPoints = new();
-        public List<Transform> soldierSpawnPoints = new();
-
-        [Header("Стартовая точка игрока")]
-        public Transform playerSpawnPoint;
-
-        [Header("Дефолтные настройки спавна (если нет подходящего этапа)")]
-        public int defaultMaxAlive = 10;
-        public float defaultSpawnCooldown = 2f;
-
-        [Header("Настройки этапов бесконечного таймера")]
-        [FormerlySerializedAs("timerStages")]
-        public List<EndlessStageConfig> endlessStages = new();
-    }
-
-    [Header("Configs")]
-    [SerializeField] private List<LocationConfig> _locations = new();
-
-    [Header("Runtime refs")]
+    [Header("Player")]
     [SerializeField] private Player _player;
+    [SerializeField] private Transform playerSpawnPoint;
 
-    // events
+    [Header("Default spawn settings")]
+    [SerializeField, Min(0)] private int defaultMaxAlive = 10;
+    [SerializeField, Min(0f)] private float defaultSpawnCooldown = 2f;
+
+    [Header("Циклические этапы таймера")]
+    [FormerlySerializedAs("endlessStages")]
+    [SerializeField] private List<TimerStageConfig> timerStages = new();
+
     public event Action<int> OnTimerLevelChanged;
     public event Action<float> OnTimerTick;
-    public event Action<Location> OnLocationStarted;
     public event Action<Enemy> OnEnemySpawned;
 
     public float ElapsedTime => _elapsedTime;
     public float RemainingTime => _elapsedTime;
     public int TimerLvl => _timerLvl;
-    public Location CurrentLocation => _currentLocation;
-
-    private Location _currentLocation;
-    private LocationConfig _currentConfig;
 
     private float _elapsedTime;
     private float _spawnTimer;
 
     private int _timerLvl;
-    private int _currentCount;
-    private int _allCount;
     private float _spawnCooldown;
+    private int _maxAlive;
     private List<EnemyEntry> _stageEnemies;
 
     private readonly HashSet<Enemy> _aliveEnemies = new();
 
-    private bool _spawningEnabled = true;
+    private bool _spawningEnabled;
     private bool _hasStarted;
 
     private void Awake()
@@ -111,9 +85,17 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        if (_locations == null || _locations.Count == 0)
+        if ((scientistSpawnPoints == null || scientistSpawnPoints.Count == 0) &&
+            (soldierSpawnPoints == null || soldierSpawnPoints.Count == 0))
         {
-            Debug.LogError("EnemySpawner: нет конфигов локаций.");
+            Debug.LogError("EnemySpawner: не назначены spawn points для Scientist и Soldier.");
+            enabled = false;
+            return;
+        }
+
+        if (defaultEnemies == null || defaultEnemies.Count == 0)
+        {
+            Debug.LogError("EnemySpawner: список defaultEnemies пуст.");
             enabled = false;
             return;
         }
@@ -133,13 +115,13 @@ public class EnemySpawner : MonoBehaviour
         if (computedLvl != _timerLvl)
         {
             _timerLvl = computedLvl;
-            ApplyLevelSettings(_timerLvl);
+            ApplyLevelSettings(activeStageIndex);
             OnTimerLevelChanged?.Invoke(_timerLvl);
         }
 
         _spawnTimer -= Time.deltaTime;
 
-        if (_spawnTimer <= 0f && _currentCount < _allCount)
+        if (_spawnTimer <= 0f && _aliveEnemies.Count < _maxAlive)
         {
             _spawnTimer = _spawnCooldown;
             Spawn();
@@ -150,39 +132,10 @@ public class EnemySpawner : MonoBehaviour
     {
         if (_hasStarted) return;
         _hasStarted = true;
-        StartLocation(_locations[0].location);
-    }
 
-    public void StartLocation(Location location)
-    {
-        _currentLocation = location;
-        _currentConfig = GetConfig(location);
-
-        if (_currentConfig == null)
+        if (playerSpawnPoint != null)
         {
-            Debug.LogError($"EnemySpawner: не найден конфиг для локации {location}");
-            enabled = false;
-            return;
-        }
-
-        if ((_currentConfig.scientistSpawnPoints == null || _currentConfig.scientistSpawnPoints.Count == 0) &&
-            (_currentConfig.soldierSpawnPoints == null || _currentConfig.soldierSpawnPoints.Count == 0))
-        {
-            Debug.LogError($"EnemySpawner: у локации {location} нет ни scientistSpawnPoints, ни soldierSpawnPoints.");
-            enabled = false;
-            return;
-        }
-
-        if (_currentConfig.enemies == null || _currentConfig.enemies.Count == 0)
-        {
-            Debug.LogError($"EnemySpawner: у локации {location} нет enemies.");
-            enabled = false;
-            return;
-        }
-
-        if (_currentConfig.playerSpawnPoint != null)
-        {
-            _player.transform.position = _currentConfig.playerSpawnPoint.position;
+            _player.transform.position = playerSpawnPoint.position;
         }
 
         Enemy.SetFrozen(false);
@@ -191,37 +144,34 @@ public class EnemySpawner : MonoBehaviour
         _elapsedTime = 0f;
         _spawnTimer = 0f;
 
-        _timerLvl = GetActiveStageIndex(0f) + 1;
-        _currentCount = 0;
+        int activeStageIndex = GetActiveStageIndex(0f);
+        _timerLvl = activeStageIndex + 1;
 
-        ApplyLevelSettings(_timerLvl);
+        ApplyLevelSettings(activeStageIndex);
         OnTimerLevelChanged?.Invoke(_timerLvl);
-        OnLocationStarted?.Invoke(_currentLocation);
     }
 
-    private void ApplyLevelSettings(int lvl)
+    private void ApplyLevelSettings(int stageIndex)
     {
-        int idx = lvl - 1;
-
-        EndlessStageConfig stage = GetStageConfig(idx);
+        TimerStageConfig stage = GetStageConfig(stageIndex);
         if (stage != null)
         {
-            _allCount = Mathf.Max(0, stage.maxAlive);
+            _maxAlive = Mathf.Max(0, stage.maxAlive);
             _spawnCooldown = Mathf.Max(0f, stage.spawnCooldown);
             _stageEnemies = stage.enemies != null && stage.enemies.Count > 0
                 ? stage.enemies
-                : _currentConfig.enemies;
+                : defaultEnemies;
             return;
         }
 
-        _allCount = Mathf.Max(0, _currentConfig.defaultMaxAlive);
-        _spawnCooldown = Mathf.Max(0f, _currentConfig.defaultSpawnCooldown);
-        _stageEnemies = _currentConfig.enemies;
+        _maxAlive = Mathf.Max(0, defaultMaxAlive);
+        _spawnCooldown = Mathf.Max(0f, defaultSpawnCooldown);
+        _stageEnemies = defaultEnemies;
     }
 
     private void Spawn()
     {
-        EnemyEntry entry = PickEnemyEntryByWeight(_stageEnemies ?? _currentConfig.enemies);
+        EnemyEntry entry = PickEnemyEntryByWeight(_stageEnemies ?? defaultEnemies);
         if (entry == null || entry.prefab == null) return;
 
         Transform sp = GetSpawnPointFor(entry.role);
@@ -231,20 +181,19 @@ public class EnemySpawner : MonoBehaviour
         enemy.Init(_player);
 
         _aliveEnemies.Add(enemy);
-        _currentCount++;
         enemy.OnDespawned += OnEnemyDespawned;
         OnEnemySpawned?.Invoke(enemy);
     }
 
     private Transform GetSpawnPointFor(EnemyRole role)
     {
-        List<Transform> points = (role == EnemyRole.Scientist)
-            ? _currentConfig.scientistSpawnPoints
-            : _currentConfig.soldierSpawnPoints;
+        List<Transform> points = role == EnemyRole.Scientist
+            ? scientistSpawnPoints
+            : soldierSpawnPoints;
 
         if (points == null || points.Count == 0)
         {
-            Debug.LogError($"EnemySpawner: нет spawnPoints для роли {role} в локации {_currentLocation}");
+            Debug.LogError($"EnemySpawner: нет spawnPoints для роли {role}");
             return null;
         }
 
@@ -255,58 +204,72 @@ public class EnemySpawner : MonoBehaviour
     {
         enemy.OnDespawned -= OnEnemyDespawned;
         _aliveEnemies.Remove(enemy);
-        _currentCount = Mathf.Max(0, _currentCount - 1);
-    }
-
-    private LocationConfig GetConfig(Location loc)
-    {
-        for (int i = 0; i < _locations.Count; i++)
-            if (_locations[i].location == loc)
-                return _locations[i];
-
-        return null;
     }
 
     private int GetActiveStageIndex(float elapsedSeconds)
     {
-        if (_currentConfig == null || _currentConfig.endlessStages == null || _currentConfig.endlessStages.Count == 0)
+        if (timerStages == null || timerStages.Count == 0)
         {
             return 0;
         }
 
-        int bestIndex = -1;
-        float bestTime = float.MinValue;
-
-        for (int i = 0; i < _currentConfig.endlessStages.Count; i++)
+        float cycleDuration = GetTotalCycleDuration();
+        if (cycleDuration <= 0f)
         {
-            EndlessStageConfig stage = _currentConfig.endlessStages[i];
-            if (stage == null) continue;
+            return 0;
+        }
 
-            float stageStart = Mathf.Max(0f, stage.startsAfterSeconds);
-            if (stageStart <= elapsedSeconds && stageStart >= bestTime)
+        float localTime = elapsedSeconds % cycleDuration;
+        float accumulated = 0f;
+
+        for (int i = 0; i < timerStages.Count; i++)
+        {
+            float duration = GetSafeStageDuration(timerStages[i]);
+            accumulated += duration;
+            if (localTime < accumulated)
             {
-                bestTime = stageStart;
-                bestIndex = i;
+                return i;
             }
         }
 
-        return bestIndex;
+        return timerStages.Count - 1;
     }
 
-    private EndlessStageConfig GetStageConfig(int stageIndex)
+    private TimerStageConfig GetStageConfig(int stageIndex)
     {
-        if (_currentConfig == null || _currentConfig.endlessStages == null || _currentConfig.endlessStages.Count == 0)
+        if (timerStages == null || timerStages.Count == 0)
         {
             return null;
         }
 
-        if (stageIndex < 0) return null;
-        if (stageIndex >= _currentConfig.endlessStages.Count)
+        if (stageIndex < 0 || stageIndex >= timerStages.Count)
         {
-            stageIndex = _currentConfig.endlessStages.Count - 1;
+            return null;
         }
 
-        return _currentConfig.endlessStages[stageIndex];
+        return timerStages[stageIndex];
+    }
+
+    private float GetTotalCycleDuration()
+    {
+        if (timerStages == null || timerStages.Count == 0)
+        {
+            return 0f;
+        }
+
+        float duration = 0f;
+        for (int i = 0; i < timerStages.Count; i++)
+        {
+            duration += GetSafeStageDuration(timerStages[i]);
+        }
+
+        return duration;
+    }
+
+    private static float GetSafeStageDuration(TimerStageConfig stage)
+    {
+        if (stage == null) return 0.1f;
+        return Mathf.Max(0.1f, stage.stageDuration);
     }
 
     public void StopRun()
