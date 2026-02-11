@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using YG;
 
 public class SceneController : MonoBehaviour
 {
@@ -19,7 +21,15 @@ public class SceneController : MonoBehaviour
             DontDestroyOnLoad(this);
         };
     }
-    
+
+    private void OnEnable()
+    {
+        if (SceneManager.GetActiveScene().name == MENU_SCENE)
+        {
+            YG2.InterstitialAdvShow();
+        }
+    }
+
     private void ChangeScene(string scene)
     {
         SceneManager.LoadScene(scene.ToString());

@@ -1836,9 +1836,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: NaN
+    y: 0
     width: 1
-    height: NaN
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -2723,7 +2723,12 @@ MonoBehaviour:
   defaultEnemies:
   - prefab: {fileID: 0}
     role: 0
-    weight: 0
+    baseWeight: 1
+    isRanged: 0
+    hasShield: 0
+    isElectric: 0
+    unlockDifficulty: 0
+    weightGrowthPerLevel: 0
   scientistSpawnPoints:
   - {fileID: 117861404}
   - {fileID: 1844997110}
@@ -2736,31 +2741,30 @@ MonoBehaviour:
   - {fileID: 365785301}
   - {fileID: 879987926}
   - {fileID: 1233051739}
-  _player: {fileID: 8299453368715849419}
+  player: {fileID: 8299453368715849419}
   playerSpawnPoint: {fileID: 4114231979937549154}
-  defaultMaxAlive: 10
-  defaultSpawnCooldown: 2
+  difficultyStepSeconds: 60
+  baseMaxAlive: 10
+  maxAlivePerDifficulty: 1
+  maxAliveCap: 35
+  baseSpawnCooldown: 2
+  cooldownDecreasePerDifficulty: 0.03
+  minSpawnCooldown: 0.45
+  globalMaxRangedAlive: 2
+  globalMaxShieldAlive: 4
   timerStages:
+  - stageDuration: 25
+    maxAliveMultiplier: 1
+    cooldownMultiplier: 1
+    enemiesOverride: []
+    maxRangedAlive: -1
+    maxShieldAlive: -1
   - stageDuration: 10
-    enemies:
-    - prefab: {fileID: 3249809664106641540, guid: 5960a7a34b00b4a49a1c77179bc4605f, type: 3}
-      role: 0
-      weight: 1
-    - prefab: {fileID: 8954939864138724390, guid: f8bdbb93bfadc73439a426f5fcde8ab2, type: 3}
-      role: 1
-      weight: 1
-    maxAlive: 5
-    spawnCooldown: 2
-  - stageDuration: 10
-    enemies:
-    - prefab: {fileID: 8954939864138724390, guid: 204649f1d0f2c7e41b9400723c1378c1, type: 3}
-      role: 1
-      weight: 1
-    - prefab: {fileID: 8954939864138724390, guid: 47dd9ead4b466a2428403623a63cff9d, type: 3}
-      role: 1
-      weight: 1
-    maxAlive: 5
-    spawnCooldown: 2
+    maxAliveMultiplier: 1
+    cooldownMultiplier: 1
+    enemiesOverride: []
+    maxRangedAlive: -1
+    maxShieldAlive: -1
 --- !u!1 &788755128
 GameObject:
   m_ObjectHideFlags: 0

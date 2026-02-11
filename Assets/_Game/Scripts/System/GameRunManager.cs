@@ -1,6 +1,7 @@
 // GameRunManager.cs (оставляю как у тебя; он и так триггерится по OnDied)
 using System;
 using UnityEngine;
+using YG;
 
 public class GameRunManager : MonoBehaviour
 {
@@ -23,6 +24,9 @@ public class GameRunManager : MonoBehaviour
     private bool _spawnerSubscribed;
     private bool _moneySubscribed;
     private MoneySystem _moneySystem;
+    
+    public string rewardID;
+    public int coins;
 
     private void Awake()
     {
@@ -139,6 +143,14 @@ public class GameRunManager : MonoBehaviour
         if (_runEnded) return;
         _runEnded = true;
         EndRun(defeatTitle);
+    }
+
+    public void MyRewardAdvShow(string id)
+    {
+        YG2.RewardedAdvShow(rewardID, () =>
+        {
+            
+        }
     }
 
     private void EndRun(string title)
