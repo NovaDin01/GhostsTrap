@@ -29,7 +29,16 @@ public class EnemySpawner : MonoBehaviour
         [Header("Кого спавним на этом этапе (если пусто, используются defaultEnemies)")]
         public List<EnemyEntry> enemies = new();
         [Min(0)] public int maxAlive = 10;
+        [Header("Опциональная прибавка к maxAlive для этого этапа")]
+        public bool useCustomMaxAliveIncrease;
+        [Min(0)] public int customMaxAliveIncrease = 1;
         [Min(0f)] public float spawnCooldown = 2f;
+    }
+
+    public enum MaxAliveProgressionMode
+    {
+        PerStageValue,
+        AdditivePerStage
     }
 
     [Header("Enemy settings")]
@@ -46,6 +55,10 @@ public class EnemySpawner : MonoBehaviour
     [Header("Default spawn settings")]
     [SerializeField, Min(0)] private int defaultMaxAlive = 10;
     [SerializeField, Min(0f)] private float defaultSpawnCooldown = 2f;
+
+    [Header("Настройка роста maxAlive")]
+    [SerializeField] private MaxAliveProgressionMode maxAliveProgressionMode = MaxAliveProgressionMode.AdditivePerStage;
+    [SerializeField, Min(0)] private int maxAliveIncreasePerStage = 1;
 
     [Header("Циклические этапы таймера")]
     [FormerlySerializedAs("endlessStages")]
@@ -156,7 +169,7 @@ public class EnemySpawner : MonoBehaviour
         TimerStageConfig stage = GetStageConfig(stageIndex);
         if (stage != null)
         {
-            _maxAlive = Mathf.Max(0, stage.maxAlive);
+            _maxAlive = ResolveMaxAlive(stage, stageIndex);
             _spawnCooldown = Mathf.Max(0f, stage.spawnCooldown);
             _stageEnemies = stage.enemies != null && stage.enemies.Count > 0
                 ? stage.enemies
@@ -167,6 +180,30 @@ public class EnemySpawner : MonoBehaviour
         _maxAlive = Mathf.Max(0, defaultMaxAlive);
         _spawnCooldown = Mathf.Max(0f, defaultSpawnCooldown);
         _stageEnemies = defaultEnemies;
+    }
+
+    private int ResolveMaxAlive(TimerStageConfig stage, int stageIndex)
+    {
+        if (maxAliveProgressionMode == MaxAliveProgressionMode.PerStageValue)
+        {
+            return Mathf.Max(0, stage.maxAlive);
+        }
+
+        int resolvedMaxAlive = Mathf.Max(0, defaultMaxAlive);
+
+        for (int i = 0; i <= stageIndex; i++)
+        {
+            TimerStageConfig currentStage = GetStageConfig(i);
+            if (currentStage == null) continue;
+
+            int stageIncrease = currentStage.useCustomMaxAliveIncrease
+                ? currentStage.customMaxAliveIncrease
+                : maxAliveIncreasePerStage;
+
+            resolvedMaxAlive += Mathf.Max(0, stageIncrease);
+        }
+
+        return resolvedMaxAlive;
     }
 
     private void Spawn()
