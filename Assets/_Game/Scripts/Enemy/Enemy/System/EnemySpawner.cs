@@ -420,7 +420,15 @@ public class EnemySpawner : MonoBehaviour
 
         return candidates[candidates.Count - 1].entry;
     }
+    
+    public void ResumeRun()
+    {
+        _spawningEnabled = true;
+        Enemy.SetFrozen(false);
+    }
+
 }
+
 
 /// <summary>
 /// Метаданные спавна (для корректных счётчиков состава при смерти).
