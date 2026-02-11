@@ -17,70 +17,118 @@ public class EnemySpawner : MonoBehaviour
     [Serializable]
     public class EnemyEntry
     {
+        [Header("Префаб врага")]
         public Enemy prefab;
+
+        [Header("Роль (определяет точки спавна)")]
         public EnemyRole role = EnemyRole.Soldier;
-        [Min(0f)] public float weight = 1f;
+
+        [Header("Базовый вес (шанс появления на старте)")]
+        [Min(0f)] public float baseWeight = 1f;
+
+        [Header("Теги спавна (НЕ влияют на характеристики)")]
+        public bool isRanged;   // автоматчик
+        public bool hasShield;  // щит
+        public bool isElectric; // электрическая дубинка
+
+        [Header("Рост появления по сложности")]
+        [Tooltip("До этого уровня сложности враг не будет выбираться вообще (мягкий gate).")]
+        [Min(0)] public int unlockDifficulty = 0;
+
+        [Tooltip("Насколько растёт вес за каждый уровень сложности.")]
+        [Min(0f)] public float weightGrowthPerLevel = 0f;
     }
 
     [Serializable]
     public class TimerStageConfig
     {
+        [Header("Длительность этапа (сек)")]
         [Min(0.1f)] public float stageDuration = 10f;
-        [Header("Кого спавним на этом этапе (если пусто, используются defaultEnemies)")]
-        public List<EnemyEntry> enemies = new();
-        [Min(0)] public int maxAlive = 10;
-        [Header("Опциональная прибавка к maxAlive для этого этапа")]
-        public bool useCustomMaxAliveIncrease;
-        [Min(0)] public int customMaxAliveIncrease = 1;
-        [Min(0f)] public float spawnCooldown = 2f;
+
+        [Header("Множитель лимита живых врагов (ритм)")]
+        [Min(0.1f)] public float maxAliveMultiplier = 1f;
+
+        [Header("Множитель кулдауна спавна (меньше = чаще)")]
+        [Min(0.1f)] public float cooldownMultiplier = 1f;
+
+        [Header("Пул врагов на этапе (если пусто — используются враги по умолчанию)")]
+        public List<EnemyEntry> enemiesOverride = new();
+
+        [Header("Ограничения состава на этапе (-1 = без ограничений)")]
+        [Tooltip("Сколько дальников (автоматчиков) можно держать одновременно живыми.")]
+        public int maxRangedAlive = -1;
+
+        [Tooltip("Сколько врагов со щитом можно держать одновременно живыми.")]
+        public int maxShieldAlive = -1;
     }
 
-    public enum MaxAliveProgressionMode
-    {
-        PerStageValue,
-        AdditivePerStage
-    }
-
-    [Header("Enemy settings")]
+    [Header("Настройки врагов (по умолчанию)")]
     [SerializeField] private List<EnemyEntry> defaultEnemies = new();
 
-    [Header("Spawn points")]
+    [Header("Точки спавна")]
     [SerializeField] private List<Transform> scientistSpawnPoints = new();
     [SerializeField] private List<Transform> soldierSpawnPoints = new();
 
-    [Header("Player")]
-    [SerializeField] private Player _player;
+    [Header("Игрок")]
+    [SerializeField] private Player player;
     [SerializeField] private Transform playerSpawnPoint;
 
-    [Header("Default spawn settings")]
-    [SerializeField, Min(0)] private int defaultMaxAlive = 10;
-    [SerializeField, Min(0f)] private float defaultSpawnCooldown = 2f;
+    [Header("Глобальная сложность (не сбрасывается)")]
+    [Tooltip("Каждые N секунд повышаем уровень сложности на 1.")]
+    [SerializeField, Min(1f)] private float difficultyStepSeconds = 60f;
 
-    [Header("Настройка роста maxAlive")]
-    [SerializeField] private MaxAliveProgressionMode maxAliveProgressionMode = MaxAliveProgressionMode.AdditivePerStage;
-    [SerializeField, Min(0)] private int maxAliveIncreasePerStage = 1;
+    [Tooltip("Базовый лимит живых врагов на сложности 0.")]
+    [SerializeField, Min(0)] private int baseMaxAlive = 10;
 
-    [Header("Циклические этапы таймера")]
+    [Tooltip("Прибавка к лимиту за каждый уровень сложности.")]
+    [SerializeField, Min(0)] private int maxAlivePerDifficulty = 1;
+
+    [Tooltip("Потолок лимита живых врагов.")]
+    [SerializeField, Min(1)] private int maxAliveCap = 35;
+
+    [Tooltip("Базовый кулдаун спавна на сложности 0.")]
+    [SerializeField, Min(0.05f)] private float baseSpawnCooldown = 2f;
+
+    [Tooltip("На сколько уменьшаем кулдаун за каждый уровень сложности.")]
+    [SerializeField, Min(0f)] private float cooldownDecreasePerDifficulty = 0.03f;
+
+    [Tooltip("Нижний предел кулдауна (быстрее нельзя).")]
+    [SerializeField, Min(0.05f)] private float minSpawnCooldown = 0.45f;
+
+    [Header("Глобальные ограничения состава (чтобы не было нечестно)")]
+    [Tooltip("Максимум автоматчиков одновременно.")]
+    [SerializeField, Min(0)] private int globalMaxRangedAlive = 2;
+
+    [Tooltip("Максимум щитовиков одновременно.")]
+    [SerializeField, Min(0)] private int globalMaxShieldAlive = 4;
+
+    [Header("Циклические этапы (ритм)")]
     [FormerlySerializedAs("endlessStages")]
     [SerializeField] private List<TimerStageConfig> timerStages = new();
 
-    public event Action<int> OnTimerLevelChanged;
+    public event Action<int> OnTimerLevelChanged; // stageIndex + 1
     public event Action<float> OnTimerTick;
     public event Action<Enemy> OnEnemySpawned;
 
     public float ElapsedTime => _elapsedTime;
-    public float RemainingTime => _elapsedTime;
     public int TimerLvl => _timerLvl;
+    public int DifficultyLevel => _difficultyLevel;
 
     private float _elapsedTime;
     private float _spawnTimer;
 
     private int _timerLvl;
-    private float _spawnCooldown;
+    private int _difficultyLevel;
+
     private int _maxAlive;
-    private List<EnemyEntry> _stageEnemies;
+    private float _spawnCooldown;
+
+    private List<EnemyEntry> _currentEnemyPool;
 
     private readonly HashSet<Enemy> _aliveEnemies = new();
+
+    private int _aliveRanged;
+    private int _aliveShield;
 
     private bool _spawningEnabled;
     private bool _hasStarted;
@@ -91,7 +139,7 @@ public class EnemySpawner : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        if (_player == null)
+        if (player == null)
         {
             Debug.LogError("EnemySpawner: Player не назначен в инспекторе.");
             enabled = false;
@@ -123,21 +171,27 @@ public class EnemySpawner : MonoBehaviour
         _elapsedTime += Time.deltaTime;
         OnTimerTick?.Invoke(_elapsedTime);
 
+        // Stage (cyclic rhythm)
         int activeStageIndex = GetActiveStageIndex(_elapsedTime);
         int computedLvl = activeStageIndex + 1;
         if (computedLvl != _timerLvl)
         {
             _timerLvl = computedLvl;
-            ApplyLevelSettings(activeStageIndex);
             OnTimerLevelChanged?.Invoke(_timerLvl);
         }
+
+        // Global difficulty (never resets)
+        _difficultyLevel = Mathf.FloorToInt(_elapsedTime / Mathf.Max(1f, difficultyStepSeconds));
+
+        // Apply runtime settings (global base + stage multipliers)
+        ApplyRuntimeSettings(activeStageIndex);
 
         _spawnTimer -= Time.deltaTime;
 
         if (_spawnTimer <= 0f && _aliveEnemies.Count < _maxAlive)
         {
             _spawnTimer = _spawnCooldown;
-            Spawn();
+            Spawn(activeStageIndex);
         }
     }
 
@@ -147,9 +201,7 @@ public class EnemySpawner : MonoBehaviour
         _hasStarted = true;
 
         if (playerSpawnPoint != null)
-        {
-            _player.transform.position = playerSpawnPoint.position;
-        }
+            player.transform.position = playerSpawnPoint.position;
 
         Enemy.SetFrozen(false);
 
@@ -157,76 +209,82 @@ public class EnemySpawner : MonoBehaviour
         _elapsedTime = 0f;
         _spawnTimer = 0f;
 
+        _aliveEnemies.Clear();
+        _aliveRanged = 0;
+        _aliveShield = 0;
+
         int activeStageIndex = GetActiveStageIndex(0f);
         _timerLvl = activeStageIndex + 1;
+        _difficultyLevel = 0;
 
-        ApplyLevelSettings(activeStageIndex);
+        ApplyRuntimeSettings(activeStageIndex);
         OnTimerLevelChanged?.Invoke(_timerLvl);
     }
 
-    private void ApplyLevelSettings(int stageIndex)
+    private void ApplyRuntimeSettings(int stageIndex)
+    {
+        // Global base
+        int maxAliveBase = baseMaxAlive + _difficultyLevel * maxAlivePerDifficulty;
+        maxAliveBase = Mathf.Clamp(maxAliveBase, 0, maxAliveCap);
+
+        float cooldownBase = baseSpawnCooldown - _difficultyLevel * cooldownDecreasePerDifficulty;
+        cooldownBase = Mathf.Max(minSpawnCooldown, cooldownBase);
+
+        // Stage multipliers
+        TimerStageConfig stage = GetStageConfig(stageIndex);
+
+        float maxAliveMul = stage != null ? Mathf.Max(0.1f, stage.maxAliveMultiplier) : 1f;
+        float cooldownMul = stage != null ? Mathf.Max(0.1f, stage.cooldownMultiplier) : 1f;
+
+        _maxAlive = Mathf.Clamp(Mathf.RoundToInt(maxAliveBase * maxAliveMul), 0, maxAliveCap);
+        _spawnCooldown = Mathf.Max(minSpawnCooldown, cooldownBase * cooldownMul);
+
+        // Enemy pool
+        _currentEnemyPool = (stage != null && stage.enemiesOverride != null && stage.enemiesOverride.Count > 0)
+            ? stage.enemiesOverride
+            : defaultEnemies;
+    }
+
+    private void Spawn(int stageIndex)
     {
         TimerStageConfig stage = GetStageConfig(stageIndex);
-        if (stage != null)
-        {
-            _maxAlive = ResolveMaxAlive(stage, stageIndex);
-            _spawnCooldown = Mathf.Max(0f, stage.spawnCooldown);
-            _stageEnemies = stage.enemies != null && stage.enemies.Count > 0
-                ? stage.enemies
-                : defaultEnemies;
-            return;
-        }
 
-        _maxAlive = Mathf.Max(0, defaultMaxAlive);
-        _spawnCooldown = Mathf.Max(0f, defaultSpawnCooldown);
-        _stageEnemies = defaultEnemies;
-    }
+        int stageMaxRanged = stage != null && stage.maxRangedAlive >= 0 ? stage.maxRangedAlive : globalMaxRangedAlive;
+        int stageMaxShield = stage != null && stage.maxShieldAlive >= 0 ? stage.maxShieldAlive : globalMaxShieldAlive;
 
-    private int ResolveMaxAlive(TimerStageConfig stage, int stageIndex)
-    {
-        if (maxAliveProgressionMode == MaxAliveProgressionMode.PerStageValue)
-        {
-            return Mathf.Max(0, stage.maxAlive);
-        }
+        EnemyEntry entry = PickEnemyEntryByDynamicWeight(
+            _currentEnemyPool ?? defaultEnemies,
+            _difficultyLevel,
+            _aliveRanged, stageMaxRanged,
+            _aliveShield, stageMaxShield
+        );
 
-        int resolvedMaxAlive = Mathf.Max(0, defaultMaxAlive);
-
-        for (int i = 0; i <= stageIndex; i++)
-        {
-            TimerStageConfig currentStage = GetStageConfig(i);
-            if (currentStage == null) continue;
-
-            int stageIncrease = currentStage.useCustomMaxAliveIncrease
-                ? currentStage.customMaxAliveIncrease
-                : maxAliveIncreasePerStage;
-
-            resolvedMaxAlive += Mathf.Max(0, stageIncrease);
-        }
-
-        return resolvedMaxAlive;
-    }
-
-    private void Spawn()
-    {
-        EnemyEntry entry = PickEnemyEntryByWeight(_stageEnemies ?? defaultEnemies);
         if (entry == null || entry.prefab == null) return;
 
         Transform sp = GetSpawnPointFor(entry.role);
         if (sp == null) return;
 
         Enemy enemy = Instantiate(entry.prefab, sp.position, sp.rotation);
-        enemy.Init(_player);
+        enemy.Init(player);
 
         _aliveEnemies.Add(enemy);
+
+        if (entry.isRanged) _aliveRanged++;
+        if (entry.hasShield) _aliveShield++;
+
         enemy.OnDespawned += OnEnemyDespawned;
+
+        EnemySpawnMeta meta = enemy.GetComponent<EnemySpawnMeta>();
+        if (meta == null) meta = enemy.gameObject.AddComponent<EnemySpawnMeta>();
+        meta.isRanged = entry.isRanged;
+        meta.hasShield = entry.hasShield;
+
         OnEnemySpawned?.Invoke(enemy);
     }
 
     private Transform GetSpawnPointFor(EnemyRole role)
     {
-        List<Transform> points = role == EnemyRole.Scientist
-            ? scientistSpawnPoints
-            : soldierSpawnPoints;
+        List<Transform> points = role == EnemyRole.Scientist ? scientistSpawnPoints : soldierSpawnPoints;
 
         if (points == null || points.Count == 0)
         {
@@ -241,20 +299,21 @@ public class EnemySpawner : MonoBehaviour
     {
         enemy.OnDespawned -= OnEnemyDespawned;
         _aliveEnemies.Remove(enemy);
+
+        EnemySpawnMeta meta = enemy.GetComponent<EnemySpawnMeta>();
+        if (meta != null)
+        {
+            if (meta.isRanged) _aliveRanged = Mathf.Max(0, _aliveRanged - 1);
+            if (meta.hasShield) _aliveShield = Mathf.Max(0, _aliveShield - 1);
+        }
     }
 
     private int GetActiveStageIndex(float elapsedSeconds)
     {
-        if (timerStages == null || timerStages.Count == 0)
-        {
-            return 0;
-        }
+        if (timerStages == null || timerStages.Count == 0) return 0;
 
         float cycleDuration = GetTotalCycleDuration();
-        if (cycleDuration <= 0f)
-        {
-            return 0;
-        }
+        if (cycleDuration <= 0f) return 0;
 
         float localTime = elapsedSeconds % cycleDuration;
         float accumulated = 0f;
@@ -263,10 +322,7 @@ public class EnemySpawner : MonoBehaviour
         {
             float duration = GetSafeStageDuration(timerStages[i]);
             accumulated += duration;
-            if (localTime < accumulated)
-            {
-                return i;
-            }
+            if (localTime < accumulated) return i;
         }
 
         return timerStages.Count - 1;
@@ -274,31 +330,18 @@ public class EnemySpawner : MonoBehaviour
 
     private TimerStageConfig GetStageConfig(int stageIndex)
     {
-        if (timerStages == null || timerStages.Count == 0)
-        {
-            return null;
-        }
-
-        if (stageIndex < 0 || stageIndex >= timerStages.Count)
-        {
-            return null;
-        }
-
+        if (timerStages == null || timerStages.Count == 0) return null;
+        if (stageIndex < 0 || stageIndex >= timerStages.Count) return null;
         return timerStages[stageIndex];
     }
 
     private float GetTotalCycleDuration()
     {
-        if (timerStages == null || timerStages.Count == 0)
-        {
-            return 0f;
-        }
+        if (timerStages == null || timerStages.Count == 0) return 0f;
 
         float duration = 0f;
         for (int i = 0; i < timerStages.Count; i++)
-        {
             duration += GetSafeStageDuration(timerStages[i]);
-        }
 
         return duration;
     }
@@ -315,25 +358,78 @@ public class EnemySpawner : MonoBehaviour
         Enemy.SetFrozen(true);
     }
 
-    private static EnemyEntry PickEnemyEntryByWeight(List<EnemyEntry> entries)
+    private static EnemyEntry PickEnemyEntryByDynamicWeight(
+        List<EnemyEntry> entries,
+        int difficultyLevel,
+        int aliveRanged, int maxRanged,
+        int aliveShield, int maxShield
+    )
     {
         if (entries == null || entries.Count == 0) return null;
 
-        float sum = 0f;
-        for (int i = 0; i < entries.Count; i++)
-            sum += Mathf.Max(0f, entries[i].weight);
+        List<(EnemyEntry entry, float weight)> candidates = new(entries.Count);
 
-        if (sum <= 0f) return entries[0];
+        // Primary pass: with caps + unlock
+        for (int i = 0; i < entries.Count; i++)
+        {
+            EnemyEntry e = entries[i];
+            if (e == null || e.prefab == null) continue;
+
+            if (difficultyLevel < e.unlockDifficulty) continue;
+
+            if (maxRanged >= 0 && e.isRanged && aliveRanged >= maxRanged) continue;
+            if (maxShield >= 0 && e.hasShield && aliveShield >= maxShield) continue;
+
+            float w = Mathf.Max(0f, e.baseWeight) + Mathf.Max(0f, e.weightGrowthPerLevel) * difficultyLevel;
+            if (w <= 0f) continue;
+
+            candidates.Add((e, w));
+        }
+
+        // Fallback: if caps removed everything, ignore caps but still keep unlock
+        if (candidates.Count == 0)
+        {
+            for (int i = 0; i < entries.Count; i++)
+            {
+                EnemyEntry e = entries[i];
+                if (e == null || e.prefab == null) continue;
+
+                if (difficultyLevel < e.unlockDifficulty) continue;
+
+                float w = Mathf.Max(0f, e.baseWeight) + Mathf.Max(0f, e.weightGrowthPerLevel) * difficultyLevel;
+                if (w <= 0f) continue;
+
+                candidates.Add((e, w));
+            }
+        }
+
+        if (candidates.Count == 0) return entries[0];
+
+        float sum = 0f;
+        for (int i = 0; i < candidates.Count; i++)
+            sum += candidates[i].weight;
 
         float roll = Random.Range(0f, sum);
         float acc = 0f;
 
-        for (int i = 0; i < entries.Count; i++)
+        for (int i = 0; i < candidates.Count; i++)
         {
-            acc += Mathf.Max(0f, entries[i].weight);
-            if (roll <= acc) return entries[i];
+            acc += candidates[i].weight;
+            if (roll <= acc) return candidates[i].entry;
         }
 
-        return entries[entries.Count - 1];
+        return candidates[candidates.Count - 1].entry;
     }
+}
+
+/// <summary>
+/// Метаданные спавна (для корректных счётчиков состава при смерти).
+/// </summary>
+public class EnemySpawnMeta : MonoBehaviour
+{
+    [Header("Теги состава (НЕ статы)")]
+    public bool isRanged;
+
+    [Header("Теги состава (НЕ статы)")]
+    public bool hasShield;
 }
