@@ -145,13 +145,13 @@ public class GameRunManager : MonoBehaviour
         EndRun(defeatTitle);
     }
 
-    public void MyRewardAdvShow(string id)
-    {
-        YG2.RewardedAdvShow(rewardID, () =>
-        {
-            
-        }
-    }
+    // public void MyRewardAdvShow(string id)
+    // {
+    //     YG2.RewardedAdvShow(rewardID, () =>
+    //     {
+    //         
+    //     }
+    // }
 
     private void EndRun(string title)
     {

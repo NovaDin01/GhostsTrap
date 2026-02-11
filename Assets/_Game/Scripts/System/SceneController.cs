@@ -22,14 +22,6 @@ public class SceneController : MonoBehaviour
         };
     }
 
-    private void OnEnable()
-    {
-        if (SceneManager.GetActiveScene().name == MENU_SCENE)
-        {
-            YG2.InterstitialAdvShow();
-        }
-    }
-
     private void ChangeScene(string scene)
     {
         SceneManager.LoadScene(scene.ToString());
