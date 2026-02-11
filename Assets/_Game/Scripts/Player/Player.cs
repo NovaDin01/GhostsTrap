@@ -45,6 +45,7 @@ public class Player : MonoBehaviour, ITakingDamage
     public int MaxHp => _maxHp;
     public int CurrentHp => currentHp;
     public bool IsAbilityActive => timerAbility > 0f;
+    public bool IsDead => _isDead;
 
     // UI should listen to this only (model -> view)
     public event Action<int, int> OnHpChanged; // (current, max)
@@ -223,6 +224,20 @@ public class Player : MonoBehaviour, ITakingDamage
         if (_isDead) return;
         _isDead = true;
         OnDied?.Invoke();
+    }
+
+
+    public void Revive(int hpAfterRevive)
+    {
+        if (!_isDead) return;
+
+        _isDead = false;
+        damageInvulnerabilityTimer = damageInvulnerabilityDuration;
+
+        int targetHp = Mathf.Max(1, hpAfterRevive);
+        currentHp = Mathf.Min(targetHp, _maxHp);
+
+        RaiseHpChanged();
     }
 
     private void RaiseHpChanged()

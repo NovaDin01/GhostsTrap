@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+#if PLUGIN_YG_2
+using YG;
+#endif
 
 public class GameManager : MonoBehaviour
 {
@@ -10,7 +13,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameRunManager gameRunManager;
     [SerializeField] private List<MonoBehaviour> systemsToEnable = new();
 
+    [Header("Startup ad")]
+    [SerializeField] private bool showStartupAdBeforeRun = true;
+    [SerializeField] private string startupRewardedAdId = "startup";
+
     private bool _hasStarted;
+    private bool _startupAdShown;
+    private bool _waitingStartupAd;
 
     private void Awake()
     {
@@ -31,6 +40,22 @@ public class GameManager : MonoBehaviour
                 systemsToEnable[i].enabled = false;
             }
         }
+    }
+
+    private void OnEnable()
+    {
+#if PLUGIN_YG_2
+        YG2.onCloseRewardedAdv += HandleStartupAdClosed;
+        YG2.onErrorRewardedAdv += HandleStartupAdError;
+#endif
+    }
+
+    private void OnDisable()
+    {
+#if PLUGIN_YG_2
+        YG2.onCloseRewardedAdv -= HandleStartupAdClosed;
+        YG2.onErrorRewardedAdv -= HandleStartupAdError;
+#endif
     }
 
     private void EnsureGameRunManager()
@@ -54,6 +79,43 @@ public class GameManager : MonoBehaviour
     }
 
     public void StartGame()
+    {
+        if (_hasStarted || _waitingStartupAd) return;
+
+        if (showStartupAdBeforeRun && !_startupAdShown)
+        {
+            _waitingStartupAd = true;
+            _startupAdShown = true;
+
+#if PLUGIN_YG_2
+            YG2.RewardedAdvShow(startupRewardedAdId);
+#else
+            _waitingStartupAd = false;
+            StartGameInternal();
+#endif
+            return;
+        }
+
+        StartGameInternal();
+    }
+
+    private void HandleStartupAdClosed()
+    {
+        if (!_waitingStartupAd) return;
+
+        _waitingStartupAd = false;
+        StartGameInternal();
+    }
+
+    private void HandleStartupAdError()
+    {
+        if (!_waitingStartupAd) return;
+
+        _waitingStartupAd = false;
+        StartGameInternal();
+    }
+
+    private void StartGameInternal()
     {
         if (_hasStarted) return;
         _hasStarted = true;

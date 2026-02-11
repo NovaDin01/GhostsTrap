@@ -1,6 +1,10 @@
 // GameRunManager.cs (оставляю как у тебя; он и так триггерится по OnDied)
 using System;
 using UnityEngine;
+using UnityEngine.UI;
+#if PLUGIN_YG_2
+using YG;
+#endif
 
 public class GameRunManager : MonoBehaviour
 {
@@ -17,11 +21,21 @@ public class GameRunManager : MonoBehaviour
     [SerializeField] private AudioClip endMusic;
     [SerializeField] private AudioSource audioSource;
 
+    [Header("Revive ad")]
+    [SerializeField] private GameObject reviveOfferWindow;
+    [SerializeField] private Button reviveAcceptButton;
+    [SerializeField] private Button reviveDeclineButton;
+    [SerializeField] private int reviveHpAfterAd = 3;
+    [SerializeField] private string reviveRewardAdId = "revive";
+
     private readonly GameStats _stats = new();
     private bool _runEnded;
     private bool _playerSubscribed;
     private bool _spawnerSubscribed;
     private bool _moneySubscribed;
+    private bool _reviveAdUsed;
+    private bool _waitingReviveAdResult;
+    private bool _reviveRewardGranted;
     private MoneySystem _moneySystem;
 
     private void Awake()
@@ -34,6 +48,11 @@ public class GameRunManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        if (reviveAcceptButton != null) reviveAcceptButton.onClick.AddListener(OnReviveAccepted);
+        if (reviveDeclineButton != null) reviveDeclineButton.onClick.AddListener(OnReviveDeclined);
+
+        HideReviveOfferWindow();
     }
 
     private void Start()
@@ -46,11 +65,19 @@ public class GameRunManager : MonoBehaviour
     {
         ResolveDependencies();
         TrySubscribe();
+#if PLUGIN_YG_2
+        YG2.onCloseRewardedAdv += HandleReviveAdClosed;
+        YG2.onErrorRewardedAdv += HandleReviveAdError;
+#endif
     }
 
     private void OnDisable()
     {
         Unsubscribe();
+#if PLUGIN_YG_2
+        YG2.onCloseRewardedAdv -= HandleReviveAdClosed;
+        YG2.onErrorRewardedAdv -= HandleReviveAdError;
+#endif
     }
 
     private void ResolveDependencies()
@@ -137,8 +164,102 @@ public class GameRunManager : MonoBehaviour
     private void HandlePlayerDied()
     {
         if (_runEnded) return;
+
+        if (CanShowReviveOffer())
+        {
+            ShowReviveOffer();
+            return;
+        }
+
         _runEnded = true;
         EndRun(defeatTitle);
+    }
+
+    private bool CanShowReviveOffer()
+    {
+        return !_reviveAdUsed && reviveOfferWindow != null;
+    }
+
+    private void ShowReviveOffer()
+    {
+        Time.timeScale = 0f;
+        reviveOfferWindow.SetActive(true);
+    }
+
+    private void HideReviveOfferWindow()
+    {
+        if (reviveOfferWindow != null)
+        {
+            reviveOfferWindow.SetActive(false);
+        }
+    }
+
+    private void OnReviveAccepted()
+    {
+        if (_runEnded || _reviveAdUsed) return;
+
+        _reviveAdUsed = true;
+        _waitingReviveAdResult = true;
+        _reviveRewardGranted = false;
+        HideReviveOfferWindow();
+
+#if PLUGIN_YG_2
+        YG2.RewardedAdvShow(reviveRewardAdId, GrantReviveReward);
+#else
+        GrantReviveReward();
+        FinalizeReviveFlow();
+#endif
+    }
+
+    private void OnReviveDeclined()
+    {
+        if (_runEnded) return;
+
+        HideReviveOfferWindow();
+        _runEnded = true;
+        EndRun(defeatTitle);
+    }
+
+    private void GrantReviveReward()
+    {
+        _reviveRewardGranted = true;
+    }
+
+    private void HandleReviveAdClosed()
+    {
+        if (!_waitingReviveAdResult) return;
+        FinalizeReviveFlow();
+    }
+
+    private void HandleReviveAdError()
+    {
+        if (!_waitingReviveAdResult) return;
+        _reviveRewardGranted = false;
+        FinalizeReviveFlow();
+    }
+
+    private void FinalizeReviveFlow()
+    {
+        _waitingReviveAdResult = false;
+
+        if (_reviveRewardGranted)
+        {
+            RevivePlayer();
+            return;
+        }
+
+        _runEnded = true;
+        EndRun(defeatTitle);
+    }
+
+    private void RevivePlayer()
+    {
+        if (player != null)
+        {
+            player.Revive(reviveHpAfterAd);
+        }
+
+        Time.timeScale = 1f;
     }
 
     private void EndRun(string title)
@@ -150,12 +271,16 @@ public class GameRunManager : MonoBehaviour
 
         if (defeatWindow != null)
         {
-            audioSource.Stop();
-            audioSource.PlayOneShot(endMusic);
+            if (audioSource != null)
+            {
+                audioSource.Stop();
+                if (endMusic != null) audioSource.PlayOneShot(endMusic);
+            }
+
             defeatWindow.Show(title, _stats);
             foreach (var obj in UIObjects)
             {
-                obj.SetActive(false);
+                if (obj != null) obj.SetActive(false);
             }
         }
     }
