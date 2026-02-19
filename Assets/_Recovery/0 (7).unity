@@ -1927,9 +1927,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
+    y: NaN
     width: 1
-    height: 1
+    height: NaN
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -2875,11 +2875,11 @@ MonoBehaviour:
   player: {fileID: 8299453368715849419}
   playerSpawnPoint: {fileID: 4114231979937549154}
   difficultyStepSeconds: 10
-  baseMaxAlive: 5
-  maxAlivePerDifficulty: 1
+  baseMaxAlive: 15
+  maxAlivePerDifficulty: 3
   maxAliveCap: 35
   baseSpawnCooldown: 2
-  cooldownDecreasePerDifficulty: 0.03
+  cooldownDecreasePerDifficulty: 0.1
   minSpawnCooldown: 0.45
   globalMaxRangedAlive: 2
   globalMaxShieldAlive: 3
@@ -7620,6 +7620,18 @@ PrefabInstance:
     - target: {fileID: 7612987916633908436, guid: 895d79289908f744f8bfb2577000b802, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8694669113665353582, guid: 895d79289908f744f8bfb2577000b802, type: 3}
+      propertyPath: m_Color.b
+      value: 0.9562873
+      objectReference: {fileID: 0}
+    - target: {fileID: 8694669113665353582, guid: 895d79289908f744f8bfb2577000b802, type: 3}
+      propertyPath: m_Color.g
+      value: 0.7216981
+      objectReference: {fileID: 0}
+    - target: {fileID: 8694669113665353582, guid: 895d79289908f744f8bfb2577000b802, type: 3}
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
