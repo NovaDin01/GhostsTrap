@@ -52,8 +52,20 @@ namespace GhostsTrap.System
             _lastScreenWidth = Screen.width;
             _lastScreenHeight = Screen.height;
 
+            if (_lastScreenWidth <= 0 || _lastScreenHeight <= 0)
+            {
+                _camera.rect = new Rect(0f, 0f, 1f, 1f);
+                return;
+            }
+
             float target = (float)targetAspect.x / targetAspect.y;
             float window = (float)Screen.width / Screen.height;
+
+            if (!float.IsFinite(target) || !float.IsFinite(window) || target <= 0f || window <= 0f)
+            {
+                _camera.rect = new Rect(0f, 0f, 1f, 1f);
+                return;
+            }
 
             if (window > target)
             {
