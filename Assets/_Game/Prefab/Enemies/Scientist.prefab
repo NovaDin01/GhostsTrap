@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   enemyData: {fileID: 11400000, guid: 5adc3288bc5a1db42a91026b09b0499c, type: 2}
-  settingsMovement: {fileID: 11400000, guid: 4347145c10e2f654ca1b71e40e8fe3e7, type: 2}
+  settingsMovement: {fileID: 11400000, guid: 8a64fd8b3b724e15b88d03f2a35d21b7, type: 2}
 --- !u!50 &2065199634225668278
 Rigidbody2D:
   serializedVersion: 5
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f252a9b923ec4ea99b65cf626b8cfb61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  config: {fileID: 0}
+  config: {fileID: 11400000, guid: 441665d808b8a8a43a09d76a1e1c7610, type: 2}
   animator: {fileID: 7679994437399497855}
   audioSource: {fileID: 0}
   vfxRoot: {fileID: 0}

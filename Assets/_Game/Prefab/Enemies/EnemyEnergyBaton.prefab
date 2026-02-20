@@ -131,9 +131,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb223e25a8cf03c4398a42e3d0a4d385, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttacker
-  enemyData: {fileID: 11400000, guid: 725cd4b11d728354a80072538d452722, type: 2}
-  settingsMovement: {fileID: 11400000, guid: cc8abef9895c5434e9ba738626cfcb5e, type: 2}
-  setting: {fileID: 11400000, guid: 6a489af29663f4841bd8c205acf1d0cc, type: 2}
+  enemyData: {fileID: 11400000, guid: 62db5fb4b9da297478c6b1a1a5948d89, type: 2}
+  settingsMovement: {fileID: 11400000, guid: e52efbe5cbf34aa0abe2f4b7d522b050, type: 2}
+  setting: {fileID: 11400000, guid: 7a14f65a3f82499b94b85c63f9ccbc27, type: 2}
 --- !u!114 &1877195403639822359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,7 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f252a9b923ec4ea99b65cf626b8cfb61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPresentation
-  config: {fileID: 11400000, guid: a8b236c31a45ba6419dd671747026ac2, type: 2}
+  config: {fileID: 11400000, guid: df39ef8fbfd2430ba030e9ebf0bb844d, type: 2}
   animator: {fileID: 6045014586344643162}
   audioSource: {fileID: 5315558892548039949}
   vfxRoot: {fileID: 0}
