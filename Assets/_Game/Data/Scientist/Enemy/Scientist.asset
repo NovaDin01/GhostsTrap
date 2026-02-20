@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Scientist
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   hp: 1
-  award: 1
-  hasArmor: 0
+  award: 100
   moveType: 0
   attackType: 0

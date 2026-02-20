@@ -1926,9 +1926,9 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
+    x: 0.00007510185
     y: 0
-    width: 1
+    width: 0.9998498
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
@@ -2474,7 +2474,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.2554792, y: 0.09877778}
   m_AnchorMax: {x: 0.74043757, y: 0.20500001}
-  m_AnchoredPosition: {x: 1.5, y: -11.000183}
+  m_AnchoredPosition: {x: 1.5, y: -11}
   m_SizeDelta: {x: -17.04, y: -14.879997}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &735677610
@@ -2878,7 +2878,7 @@ MonoBehaviour:
   baseMaxAlive: 5
   maxAlivePerDifficulty: 1
   maxAliveCap: 35
-  baseSpawnCooldown: 2
+  baseSpawnCooldown: 1
   cooldownDecreasePerDifficulty: 0.03
   minSpawnCooldown: 0.45
   globalMaxRangedAlive: 2
@@ -2890,6 +2890,18 @@ MonoBehaviour:
     enemiesOverride: []
     maxRangedAlive: -1
     maxShieldAlive: -1
+  - stageDuration: 10
+    maxAliveMultiplier: 1.5
+    cooldownMultiplier: 1.3
+    enemiesOverride: []
+    maxRangedAlive: 5
+    maxShieldAlive: 3
+  - stageDuration: 10
+    maxAliveMultiplier: 2
+    cooldownMultiplier: 1.6
+    enemiesOverride: []
+    maxRangedAlive: 3
+    maxShieldAlive: 5
 --- !u!1 &788755128
 GameObject:
   m_ObjectHideFlags: 0
@@ -3250,7 +3262,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 548bc46c2e9717646b264cb3b4f44d08, type: 3}
+  m_Resource: {fileID: 8300000, guid: ada441ff96f142d4da7c21d03a62a540, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.049
   m_Pitch: 1
@@ -3351,10 +3363,10 @@ MonoBehaviour:
   bulletHitEffect: {fileID: 9208442164227617347, guid: 58dc08ca52ad8294ab9754ec9d3cfe2d, type: 3}
   playerHitEffect: {fileID: 9208442164227617347, guid: f3b40c7ed7dd34547800e909e845c9b4, type: 3}
   peopleEatEffect: {fileID: 9208442164227617347, guid: 988d7b4023578a94abe4e55bdf3a7caa, type: 3}
-  catchClip: {fileID: 8300000, guid: e0b1cb0b3f9ee5646b79ff388cef2db9, type: 3}
+  catchClip: {fileID: 0}
   throwClip: {fileID: 0}
   enemyMeleeAttackClip: {fileID: 0}
-  enemyShootClip: {fileID: 8300000, guid: 3f21b40867c8f624ba62db027e73fcf8, type: 3}
+  enemyShootClip: {fileID: 0}
   buttonClickClip: {fileID: 0}
   sfxVolume: 0.437
 --- !u!4 &1104137783 stripped
@@ -5281,7 +5293,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TentaclesTimeAttack
   upgradeData: {fileID: 11400000, guid: 6e1bad5e9457f7a4582907bf966454df, type: 2}
-  amount: 0.15
+  amount: 0.3
 --- !u!114 &1941825248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7049,7 +7061,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.011184756, y: 0.1814594}
   m_AnchorMax: {x: 1, y: 0.81000006}
-  m_AnchoredPosition: {x: -6.000244, y: 0.030273438}
+  m_AnchoredPosition: {x: -6, y: 0.030273438}
   m_SizeDelta: {x: 11.8, y: -90.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5237604831322410348
@@ -8268,7 +8280,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.17327084, y: 0.1712963}
   m_AnchorMax: {x: 0.827, y: 0.82911116}
-  m_AnchoredPosition: {x: -13.000122, y: 0}
+  m_AnchoredPosition: {x: -13, y: 0}
   m_SizeDelta: {x: -9.01001, y: 4.26001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &8928611125321801451

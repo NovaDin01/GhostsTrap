@@ -16,7 +16,9 @@ MonoBehaviour:
   - EventType: 3
     AnimatorTrigger: Caught
     SfxClip:
-    - {fileID: 8300000, guid: e0b1cb0b3f9ee5646b79ff388cef2db9, type: 3}
+    - {fileID: 8300000, guid: ad9e74ac1e4ec83448863e82fb6eda33, type: 3}
+    - {fileID: 8300000, guid: 5c316bce75767d948a6d65a05fbfa694, type: 3}
+    - {fileID: 8300000, guid: a9b32db540da70446ad1ceac6bbc53d6, type: 3}
     SfxVolume: 1
     VfxPrefab: {fileID: 0}
     ParticlePrefab: {fileID: 0}

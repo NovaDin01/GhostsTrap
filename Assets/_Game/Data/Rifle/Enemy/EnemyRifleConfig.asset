@@ -15,16 +15,25 @@ MonoBehaviour:
   entries:
   - EventType: 1
     AnimatorTrigger: Attack
-    SfxClip: {fileID: 8300000, guid: 60a7cc8327dce3c499079c1ab4baab8e, type: 3}
+    SfxClip:
+    - {fileID: 8300000, guid: e36a380fa6ec14b45bf138e45f11fb48, type: 3}
+    - {fileID: 8300000, guid: f83e38fe34b667e4d8ef10a196b98ff0, type: 3}
+    - {fileID: 8300000, guid: f1c64bcd0b229f9419a63a8a4931449c, type: 3}
+    - {fileID: 8300000, guid: 52e1b151df0536c438e3a62204e1f63c, type: 3}
+    - {fileID: 8300000, guid: 2a5b003ed3736f249b5f902504da0a34, type: 3}
+    - {fileID: 8300000, guid: 5e0412dff9507c847942bf68d4acc774, type: 3}
     SfxVolume: 0.603
     VfxPrefab: {fileID: 0}
     ParticlePrefab: {fileID: 0}
     UseWorldPosition: 0
     PositionOffset: {x: 0, y: 0, z: 0}
   - EventType: 3
-    AnimatorTrigger: 
-    SfxClip: {fileID: 0}
-    SfxVolume: 0.606
+    AnimatorTrigger: Caught
+    SfxClip:
+    - {fileID: 8300000, guid: ad9e74ac1e4ec83448863e82fb6eda33, type: 3}
+    - {fileID: 8300000, guid: 5c316bce75767d948a6d65a05fbfa694, type: 3}
+    - {fileID: 8300000, guid: a9b32db540da70446ad1ceac6bbc53d6, type: 3}
+    SfxVolume: 1
     VfxPrefab: {fileID: 0}
     ParticlePrefab: {fileID: 0}
     UseWorldPosition: 0
