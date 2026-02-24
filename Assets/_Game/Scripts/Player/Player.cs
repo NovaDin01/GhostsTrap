@@ -232,6 +232,15 @@ public class Player : MonoBehaviour, ITakingDamage
         animator.SetTrigger("Damage");
     }
 
+
+    public void ReviveFullHp()
+    {
+        _isDead = false;
+        currentHp = _maxHp;
+        damageInvulnerabilityTimer = damageInvulnerabilityDuration;
+        OnApplyHeal?.Invoke();
+    }
+
     private void Die()
     {
         if (_isDead) return;

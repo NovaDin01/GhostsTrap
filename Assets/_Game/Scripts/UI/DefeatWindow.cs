@@ -9,8 +9,9 @@ public class DefeatWindow : MonoBehaviour
     [SerializeField] private TMP_Text enemiesCollectedText;
     [SerializeField] private TMP_Text locationsCompletedText;
     [SerializeField] private TMP_Text timeText;
+    [SerializeField] private TMP_Text bestTimeText;
 
-    public void Show(string title, GameStats stats)
+    public void Show(string title, GameStats stats, int bestSurvivalSeconds = -1)
     {
         if (titleText != null)
         {
@@ -44,6 +45,20 @@ public class DefeatWindow : MonoBehaviour
                 int minutes = Mathf.FloorToInt(stats.RunDuration / 60f);
                 int seconds = Mathf.FloorToInt(stats.RunDuration % 60f);
                 timeText.text = $"{minutes:0}:{seconds:00}";
+            }
+        }
+
+        if (bestTimeText != null)
+        {
+            if (bestSurvivalSeconds >= 0)
+            {
+                int bestMinutes = Mathf.FloorToInt(bestSurvivalSeconds / 60f);
+                int bestSeconds = bestSurvivalSeconds % 60;
+                bestTimeText.text = $"Рекорд: {bestMinutes:0}:{bestSeconds:00}";
+            }
+            else
+            {
+                bestTimeText.text = string.Empty;
             }
         }
 
