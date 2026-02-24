@@ -230,6 +230,14 @@ public class Player : MonoBehaviour, ITakingDamage
         OnHpChanged?.Invoke(currentHp, _maxHp);
     }
 
+    public void ReviveFullHp()
+    {
+        _isDead = false;
+        currentHp = _maxHp;
+        damageInvulnerabilityTimer = damageInvulnerabilityDuration;
+        RaiseHpChanged();
+    }
+
     // Upgrades (your existing “quick hacks”)
     public void UpgradeGridCount()
     {

@@ -1,6 +1,5 @@
-// GameRunManager.cs (оставляю как у тебя; он и так триггерится по OnDied)
-using System;
 using UnityEngine;
+using YG;
 
 public class GameRunManager : MonoBehaviour
 {
@@ -9,6 +8,7 @@ public class GameRunManager : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Player player;
     [SerializeField] private DefeatWindow defeatWindow;
+    [SerializeField] private ReviveOfferWindow reviveOfferWindow;
     [SerializeField] private GameObject[] UIObjects;
 
     [Header("Optional title text")]
@@ -16,6 +16,10 @@ public class GameRunManager : MonoBehaviour
     [SerializeField] private AudioClip mainMusic;
     [SerializeField] private AudioClip endMusic;
     [SerializeField] private AudioSource audioSource;
+
+    [Header("Leaderboard")]
+    [SerializeField] private string survivalLeaderboardName = "survival_time";
+    [SerializeField] private string localBestKey = "BestSurvivalTimeSeconds";
 
     private readonly GameStats _stats = new();
     private bool _runEnded;
@@ -115,6 +119,15 @@ public class GameRunManager : MonoBehaviour
     {
         _runEnded = false;
         _stats.StartRun();
+
+        Time.timeScale = 1f;
+        SetHudActive(true);
+
+        if (reviveOfferWindow != null)
+            reviveOfferWindow.Hide();
+
+        if (AdManager.Instance != null)
+            AdManager.Instance.ResetRunState();
     }
 
     private void HandleEnemySpawned(Enemy enemy)
@@ -137,26 +150,107 @@ public class GameRunManager : MonoBehaviour
     private void HandlePlayerDied()
     {
         if (_runEnded) return;
-        _runEnded = true;
+
+        if (reviveOfferWindow != null && AdManager.Instance != null)
+        {
+            PauseForReviveChoice();
+            reviveOfferWindow.Show(HandleWatchAdClicked, HandleReviveCancelled);
+            return;
+        }
+
+        EndRun(defeatTitle);
+    }
+
+    private void PauseForReviveChoice()
+    {
+        if (enemySpawner != null) enemySpawner.StopRun();
+        Time.timeScale = 0f;
+    }
+
+    private void HandleWatchAdClicked()
+    {
+        if (reviveOfferWindow != null)
+            reviveOfferWindow.Hide();
+
+        Time.timeScale = 1f;
+
+        AdManager.Instance.TryRevivePlayer(RevivePlayerAfterAd, HandleReviveCancelled);
+    }
+
+    private void RevivePlayerAfterAd()
+    {
+        if (_runEnded) return;
+
+        if (player != null)
+            player.ReviveFullHp();
+
+        if (enemySpawner != null)
+            enemySpawner.ResumeRun();
+
+        Time.timeScale = 1f;
+        SetHudActive(true);
+
+        if (audioSource != null && mainMusic != null && !audioSource.isPlaying)
+            audioSource.PlayOneShot(mainMusic);
+    }
+
+    private void HandleReviveCancelled()
+    {
         EndRun(defeatTitle);
     }
 
     private void EndRun(string title)
     {
+        if (_runEnded) return;
+        _runEnded = true;
+
+        if (reviveOfferWindow != null)
+            reviveOfferWindow.Hide();
+
         _stats.StopRun();
+        TryUpdateLeaderboard();
+
         if (enemySpawner != null) enemySpawner.StopRun();
 
         Time.timeScale = 0f;
 
         if (defeatWindow != null)
         {
-            audioSource.Stop();
-            audioSource.PlayOneShot(endMusic);
-            defeatWindow.Show(title, _stats);
-            foreach (var obj in UIObjects)
+            if (audioSource != null)
             {
-                obj.SetActive(false);
+                audioSource.Stop();
+                if (endMusic != null)
+                    audioSource.PlayOneShot(endMusic);
             }
+
+            defeatWindow.Show(title, _stats);
+            SetHudActive(false);
+        }
+    }
+
+    private void TryUpdateLeaderboard()
+    {
+        float currentRun = Mathf.Max(0f, _stats.RunDuration);
+        float localBest = PlayerPrefs.GetFloat(localBestKey, 0f);
+
+        if (currentRun <= localBest)
+            return;
+
+        PlayerPrefs.SetFloat(localBestKey, currentRun);
+        PlayerPrefs.Save();
+
+        if (YG2.isSDKEnabled && !string.IsNullOrEmpty(survivalLeaderboardName))
+            YG2.SetLBTimeConvert(survivalLeaderboardName, currentRun);
+    }
+
+    private void SetHudActive(bool active)
+    {
+        if (UIObjects == null) return;
+
+        for (int i = 0; i < UIObjects.Length; i++)
+        {
+            if (UIObjects[i] != null)
+                UIObjects[i].SetActive(active);
         }
     }
 }
