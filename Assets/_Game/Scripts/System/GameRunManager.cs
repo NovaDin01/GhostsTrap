@@ -8,6 +8,8 @@ public class GameRunManager : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Player player;
     [SerializeField] private DefeatWindow defeatWindow;
+    [SerializeField] private ReviveOfferWindow reviveOfferWindow;
+    [SerializeField] private RunLeaderboard runLeaderboard;
 
     [Header("Optional title text")]
     [SerializeField] private string defeatTitle = "Поражение";
@@ -22,6 +24,7 @@ public class GameRunManager : MonoBehaviour
     private bool _playerSubscribed;
     private bool _spawnerSubscribed;
     private bool _moneySubscribed;
+    private bool _reviveUsed;
     private MoneySystem _moneySystem;
 
     private void Awake()
@@ -68,6 +71,26 @@ public class GameRunManager : MonoBehaviour
         if (_moneySystem == null)
         {
             _moneySystem = MoneySystem.Instance;
+        }
+
+        if (reviveOfferWindow == null)
+        {
+            reviveOfferWindow = FindObjectOfType<ReviveOfferWindow>();
+            if (reviveOfferWindow == null)
+            {
+                var go = new GameObject(nameof(ReviveOfferWindow));
+                reviveOfferWindow = go.AddComponent<ReviveOfferWindow>();
+            }
+        }
+
+        if (runLeaderboard == null)
+        {
+            runLeaderboard = FindObjectOfType<RunLeaderboard>();
+            if (runLeaderboard == null)
+            {
+                var go = new GameObject(nameof(RunLeaderboard));
+                runLeaderboard = go.AddComponent<RunLeaderboard>();
+            }
         }
     }
 
@@ -129,6 +152,7 @@ public class GameRunManager : MonoBehaviour
     private void StartRun()
     {
         _runEnded = false;
+        _reviveUsed = false;
         _stats.StartRun();
     }
 
@@ -171,8 +195,50 @@ public class GameRunManager : MonoBehaviour
     private void HandlePlayerDied()
     {
         if (_runEnded) return;
+
+        if (!_reviveUsed)
+        {
+            _reviveUsed = true;
+            ShowReviveOffer();
+            return;
+        }
+
         _runEnded = true;
-        EndRun(defeatTitle, true);
+        EndRun(defeatTitle, false);
+    }
+
+    private void ShowReviveOffer()
+    {
+        Time.timeScale = 0f;
+        reviveOfferWindow.Show(HandleWatchAdSelected, HandleReviveCancelled);
+    }
+
+    private void HandleWatchAdSelected()
+    {
+        if (YandexAdsBridge.Instance == null)
+        {
+            HandleReviveCancelled();
+            return;
+        }
+
+        YandexAdsBridge.Instance.ShowRewardedAd(HandleReviveRewardReceived, HandleReviveCancelled);
+    }
+
+    private void HandleReviveRewardReceived()
+    {
+        reviveOfferWindow.Hide();
+        Time.timeScale = 1f;
+        if (player != null)
+        {
+            player.ReviveWithFullHp();
+        }
+    }
+
+    private void HandleReviveCancelled()
+    {
+        reviveOfferWindow.Hide();
+        _runEnded = true;
+        EndRun(defeatTitle, false);
     }
 
     private void EndRun(string title, bool showDefeatAd)
@@ -182,6 +248,8 @@ public class GameRunManager : MonoBehaviour
         {
             enemySpawner.StopRun();
         }
+
+        runLeaderboard?.TryUpdateRecord(_stats.RunDuration);
 
         if (showDefeatAd && YandexAdsBridge.Instance != null)
         {
