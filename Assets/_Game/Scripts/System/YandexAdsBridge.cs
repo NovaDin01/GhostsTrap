@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -5,8 +6,10 @@ public class YandexAdsBridge : MonoBehaviour
 {
     public static YandexAdsBridge Instance;
 
+    private Action _rewardedCallback;
+    private Action _rewardedFailedCallback;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    
     private static void EnsureInstance()
     {
         if (Instance != null) return;
@@ -33,7 +36,6 @@ public class YandexAdsBridge : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
     }
 
     public void ShowStartupAd()
@@ -46,10 +48,42 @@ public class YandexAdsBridge : MonoBehaviour
         ShowFullscreenAd("defeat");
     }
 
+    public void ShowRewardedAd(Action onRewarded, Action onFailed)
+    {
+        _rewardedCallback = onRewarded;
+        _rewardedFailedCallback = onFailed;
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        Yandex_ShowRewardedAd("revive");
+#else
+        Debug.Log("[YandexAdsBridge] Rewarded ad simulated in editor");
+        _rewardedCallback?.Invoke();
+        ClearRewardedCallbacks();
+#endif
+    }
+
+    public void OnRewardedAdSuccess()
+    {
+        _rewardedCallback?.Invoke();
+        ClearRewardedCallbacks();
+    }
+
+    public void OnRewardedAdFailed()
+    {
+        _rewardedFailedCallback?.Invoke();
+        ClearRewardedCallbacks();
+    }
+
+    private void ClearRewardedCallbacks()
+    {
+        _rewardedCallback = null;
+        _rewardedFailedCallback = null;
+    }
+
     private void ShowFullscreenAd(string placement)
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
-        ShowYandexFullscreenAd(placement);
+        Yandex_ShowFullscreenAd(placement);
 #else
         Debug.Log($"[YandexAdsBridge] Request ad: {placement}");
 #endif
@@ -57,6 +91,9 @@ public class YandexAdsBridge : MonoBehaviour
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")]
-    private static extern void ShowYandexFullscreenAd(string placement);
+    private static extern void Yandex_ShowFullscreenAd(string placement);
+
+    [DllImport("__Internal")]
+    private static extern void Yandex_ShowRewardedAd(string placement);
 #endif
 }

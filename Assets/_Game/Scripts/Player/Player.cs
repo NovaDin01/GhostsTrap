@@ -199,6 +199,14 @@ public class Player : MonoBehaviour, ITakingDamage
         OnApplyHeal?.Invoke();
     }
 
+    public void ReviveWithFullHp()
+    {
+        _isDead = false;
+        currentHp = _maxHp;
+        damageInvulnerabilityTimer = damageInvulnerabilityDuration;
+        OnApplyHeal?.Invoke();
+    }
+
     public void ApplyDamage(int amount)
     {
         if (_isDead)

@@ -63,6 +63,32 @@
       return true;
     }
 
+
+    function showYandexGamesRewarded(placement) {
+      if (!window.ysdk || !window.ysdk.adv || !window.ysdk.adv.showRewardedVideo) {
+        return false;
+      }
+
+      window.ysdk.adv.showRewardedVideo({
+        callbacks: {
+          onRewarded: () => {
+            console.log("Yandex Games Rewarded success", placement);
+            if (window.unityInstance) {
+              window.unityInstance.SendMessage('YandexAdsBridge', 'OnRewardedAdSuccess');
+            }
+          },
+          onClose: () => console.log("Yandex Games Rewarded closed", placement),
+          onError: (e) => {
+            console.warn("Yandex Games Rewarded error", placement, e);
+            if (window.unityInstance) {
+              window.unityInstance.SendMessage('YandexAdsBridge', 'OnRewardedAdFailed');
+            }
+          }
+        }
+      });
+      return true;
+    }
+
     function showYandexContextFullscreen(placement) {
       const blockId = "YANDEX_ADS_FULLSCREEN_BLOCK_ID";
       if (blockId === "YANDEX_ADS_FULLSCREEN_BLOCK_ID") {
@@ -85,6 +111,18 @@
       });
       return true;
     }
+
+
+    window.Yandex_ShowRewardedAd = function (placement) {
+      if (showYandexGamesRewarded(placement)) {
+        return;
+      }
+
+      console.warn("Yandex Ads: rewarded not configured", placement);
+      if (window.unityInstance) {
+        window.unityInstance.SendMessage('YandexAdsBridge', 'OnRewardedAdFailed');
+      }
+    };
 
     window.Yandex_ShowFullscreenAd = function (placement) {
       if (showYandexGamesFullscreen(placement)) {
@@ -143,7 +181,8 @@
       if (progressBarFull) {
         progressBarFull.style.width = (100 * progress) + "%";
       }
-    }).then(() => {
+    }).then((instance) => {
+      window.unityInstance = instance;
       if (loadingBar) {
         loadingBar.style.display = "none";
       }
