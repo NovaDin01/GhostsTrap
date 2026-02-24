@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class GameRunManager : MonoBehaviour
@@ -8,6 +7,8 @@ public class GameRunManager : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Player player;
     [SerializeField] private DefeatWindow defeatWindow;
+    [SerializeField] private ReviveOfferWindow reviveOfferWindow;
+    [SerializeField] private SurvivalLeaderboard survivalLeaderboard;
 
     [Header("Optional title text")]
     [SerializeField] private string defeatTitle = "Поражение";
@@ -19,6 +20,7 @@ public class GameRunManager : MonoBehaviour
 
     private readonly GameStats _stats = new();
     private bool _runEnded;
+    private bool _isAwaitingReviveChoice;
     private bool _playerSubscribed;
     private bool _spawnerSubscribed;
     private bool _moneySubscribed;
@@ -129,6 +131,7 @@ public class GameRunManager : MonoBehaviour
     private void StartRun()
     {
         _runEnded = false;
+        _isAwaitingReviveChoice = false;
         _stats.StartRun();
     }
 
@@ -165,27 +168,93 @@ public class GameRunManager : MonoBehaviour
     {
         if (_runEnded) return;
         _runEnded = true;
-        EndRun(winTitle, false);
+        EndRun(winTitle);
     }
 
     private void HandlePlayerDied()
     {
-        if (_runEnded) return;
-        _runEnded = true;
-        EndRun(defeatTitle, true);
+        if (_runEnded || _isAwaitingReviveChoice)
+        {
+            return;
+        }
+
+        _isAwaitingReviveChoice = true;
+        Time.timeScale = 0f;
+
+        if (reviveOfferWindow != null)
+        {
+            reviveOfferWindow.Show(OnWatchAdForRevive, OnCancelRevive);
+            return;
+        }
+
+        OnCancelRevive();
     }
 
-    private void EndRun(string title, bool showDefeatAd)
+    private void OnWatchAdForRevive()
+    {
+        if (YourGamesBridge.Instance == null)
+        {
+            OnCancelRevive();
+            return;
+        }
+
+        YourGamesBridge.Instance.ShowRewardedAd(OnRewardedReviveCompleted);
+    }
+
+    private void OnRewardedReviveCompleted(bool success)
+    {
+        if (!success)
+        {
+            OnCancelRevive();
+            return;
+        }
+
+        if (reviveOfferWindow != null)
+        {
+            reviveOfferWindow.Hide();
+        }
+
+        _isAwaitingReviveChoice = false;
+
+        if (player != null)
+        {
+            player.ReviveFullHp();
+        }
+
+        Time.timeScale = 1f;
+    }
+
+    private void OnCancelRevive()
+    {
+        if (reviveOfferWindow != null)
+        {
+            reviveOfferWindow.Hide();
+        }
+
+        if (_runEnded)
+        {
+            return;
+        }
+
+        _runEnded = true;
+        _isAwaitingReviveChoice = false;
+        EndRun(defeatTitle);
+    }
+
+    private void EndRun(string title)
     {
         _stats.StopRun();
+
         if (enemySpawner != null)
         {
             enemySpawner.StopRun();
         }
 
-        if (showDefeatAd && YandexAdsBridge.Instance != null)
+        int bestTimeSeconds = -1;
+        if (survivalLeaderboard != null)
         {
-            YandexAdsBridge.Instance.ShowDefeatAd();
+            survivalLeaderboard.TryUpdateRecord(_stats.RunDuration);
+            bestTimeSeconds = survivalLeaderboard.BestSurvivalSeconds;
         }
 
         Time.timeScale = 0f;
@@ -193,7 +262,7 @@ public class GameRunManager : MonoBehaviour
         {
             audioSource.Stop();
             audioSource.PlayOneShot(endMusic);
-            defeatWindow.Show(title, _stats);
+            defeatWindow.Show(title, _stats, bestTimeSeconds);
         }
     }
 }
