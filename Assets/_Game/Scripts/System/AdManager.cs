@@ -8,6 +8,9 @@ public class AdManager : MonoBehaviour
     private bool _adShownOnStart = false;      // Реклама при старте игры
     private bool _reviveUsed = false;          // Воскрешение за просмотр рекламы
 
+    [Header("Rewarded Ads")]
+    [SerializeField] private string reviveRewardId = "revive_player";
+
     private void Awake()
     {
         // Singleton, чтобы один объект был на всю игру
@@ -45,29 +48,36 @@ public class AdManager : MonoBehaviour
         }
     }
 
+    public void ResetRunState()
+    {
+        _reviveUsed = false;
+    }
+
     /// <summary>
-    /// Воскрешение игрока через просмотр рекламы
+    /// Воскрешение игрока через просмотр rewarded-рекламы.
     /// </summary>
-    public void TryRevivePlayer(System.Action onRevive)
+    public void TryRevivePlayer(System.Action onRevive, System.Action onFailed = null)
     {
         if (_reviveUsed)
         {
             Debug.Log("Воскрешение за рекламу уже использовано!");
+            onFailed?.Invoke();
             return;
         }
 
         if (YG2.isSDKEnabled)
         {
-            Debug.Log("Показываем рекламу для воскрешения игрока...");
-            YG2.InterstitialAdvShow();
-
-            // Считаем, что игрок "воскрес" после показа рекламы
-            _reviveUsed = true;
-            onRevive?.Invoke();
+            Debug.Log("Показываем rewarded-рекламу для воскрешения игрока...");
+            YG2.RewardedAdvShow(reviveRewardId, () =>
+            {
+                _reviveUsed = true;
+                onRevive?.Invoke();
+            });
         }
         else
         {
             Debug.LogWarning("SDK не готов, нельзя воскресить игрока через рекламу");
+            onFailed?.Invoke();
         }
     }
 }
